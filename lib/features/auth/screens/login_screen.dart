@@ -6,6 +6,8 @@ import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/auth_errors.dart';
+import '../../../data/repositories/auth_repository.dart';
+import '../../../data/repositories/users_repository.dart';
 import '../../../shared/widgets/gradient_button.dart';
 import '../../../shared/widgets/mascot_widgets.dart';
 import '../../../shared/widgets/doodle_widget.dart';
@@ -44,7 +46,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (authState is AsyncError) {
       _showError(humaniseAuthError(authState.error!));
     } else {
-      context.go(AppRoutes.home);
+      // Check profile status before navigating
+      try {
+        final repo = UsersRepository();
+        final profile = await repo.getOwnProfile();
+        if (!mounted) return;
+        if (profile != null && !profile.isApproved) {
+          context.go(AppRoutes.approvalStatus);
+          return;
+        }
+        // Auto-process approved email change
+        if (profile != null &&
+            profile.status.startsWith('email_change_approved:')) {
+          final newEmail =
+              profile.status.replaceFirst('email_change_approved:', '');
+          try {
+            await AuthRepository().updateEmail(newEmail);
+            await repo.processApprovedEmailChange(newEmail);
+          } catch (_) {}
+        }
+      } catch (_) {}
+      if (mounted) context.go(AppRoutes.home);
     }
   }
 
@@ -177,7 +199,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             type: TextInputType.emailAddress,
                             validator: (v) {
                               if (v == null || v.trim().isEmpty) {
-                                  return 'Email is required';
+                                return 'Email is required';
                               }
                               return null;
                             },
@@ -202,6 +224,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             label: 'Sign In',
                             onTap: isLoading ? null : _submit,
                             isLoading: isLoading,
+                          ),
+                          const SizedBox(height: 16),
+                          Center(
+                            child: GestureDetector(
+                              onTap: () => context.push(AppRoutes.forgotPassword),
+                              child: Text(
+                                'Forgot Password?',
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: AppColors.cream100,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
                           ),
                           const SizedBox(height: 24),
                           Row(

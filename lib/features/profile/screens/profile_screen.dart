@@ -142,6 +142,11 @@ class _ProfileScaffoldState extends ConsumerState<_ProfileScaffold>
                       : () => ref
                           .read(followProvider.notifier)
                           .toggle(),
+                  onAdminTap: widget.isOwn &&
+                          SupabaseService.client.auth.currentUser?.email ==
+                              'rekt11.cam@gmail.com'
+                      ? () => context.push(AppRoutes.adminRequests)
+                      : null,
                 ),
               ),
               SliverPersistentHeader(

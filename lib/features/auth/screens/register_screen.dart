@@ -77,7 +77,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       setState(() => _frogExpression = FrogExpression.confused);
       _showError(humaniseAuthError(authState.error!));
     } else {
-      context.go(AppRoutes.home);
+      // Sign out immediately — account needs admin approval first.
+      await ref.read(authNotifierProvider.notifier).signOut();
+      if (mounted) context.go(AppRoutes.approvalStatus);
     }
   }
 

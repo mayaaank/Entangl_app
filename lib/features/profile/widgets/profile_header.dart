@@ -14,6 +14,7 @@ class ProfileHeader extends ConsumerWidget {
   final VoidCallback onLogout;
   final VoidCallback onEditProfile;
   final VoidCallback? onFollowTap;
+  final VoidCallback? onAdminTap;
 
   const ProfileHeader({
     super.key,
@@ -22,6 +23,7 @@ class ProfileHeader extends ConsumerWidget {
     required this.onLogout,
     required this.onEditProfile,
     this.onFollowTap,
+    this.onAdminTap,
   });
 
   @override
@@ -139,6 +141,13 @@ class ProfileHeader extends ConsumerWidget {
                   ),
                   const Spacer(),
                   if (isOwn) ...[
+                    if (onAdminTap != null) ...[
+                      _OutlineButton(
+                        label: 'Admin',
+                        onTap:  onAdminTap!,
+                      ),
+                      const SizedBox(width: 8),
+                    ],
                     _OutlineButton(
                       label: 'Edit profile',
                       onTap: onEditProfile,

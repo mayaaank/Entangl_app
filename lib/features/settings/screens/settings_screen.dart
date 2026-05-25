@@ -79,7 +79,7 @@ class SettingsScreen extends ConsumerWidget {
               SettingsChevronRow(
                   icon: Icons.lock_outline,
                   label: 'Change Password',
-                  onTap: () {}),
+                  onTap: () => context.push(AppRoutes.editProfile)),
               const Divider(height: 1, indent: 56),
               SettingsChevronRow(
                   icon: Icons.privacy_tip_outlined,

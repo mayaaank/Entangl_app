@@ -5,6 +5,7 @@ class UserModel {
   final String? bio;
   final String? avatarUrl;
   final String  createdAt;
+  final String  status;
 
   const UserModel({
     required this.id,
@@ -13,6 +14,7 @@ class UserModel {
     this.bio,
     this.avatarUrl,
     required this.createdAt,
+    this.status = 'approved',
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
@@ -22,6 +24,7 @@ class UserModel {
         bio:       json['bio']        as String?,
         avatarUrl: json['avatar_url'] as String?,
         createdAt: json['created_at'] as String? ?? '',
+        status:    json['status']     as String? ?? 'approved',
       );
 
   Map<String, dynamic> toJson() => {
@@ -31,6 +34,7 @@ class UserModel {
         'bio':        bio,
         'avatar_url': avatarUrl,
         'created_at': createdAt,
+        'status':     status,
       };
 
   UserModel copyWith({
@@ -38,6 +42,7 @@ class UserModel {
     String? fullName,
     String? bio,
     String? avatarUrl,
+    String? status,
   }) =>
       UserModel(
         id:        id,
@@ -46,5 +51,13 @@ class UserModel {
         bio:       bio       ?? this.bio,
         avatarUrl: avatarUrl ?? this.avatarUrl,
         createdAt: createdAt,
+        status:    status    ?? this.status,
       );
+
+  /// Whether this user is fully approved to access the app.
+  bool get isApproved =>
+      status == 'approved' ||
+      status == 'approved_email_changed' ||
+      status.startsWith('email_change_pending:') ||
+      status.startsWith('email_change_approved:');
 }

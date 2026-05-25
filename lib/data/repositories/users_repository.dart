@@ -145,4 +145,101 @@ class UsersRepository {
       return UserModel.fromJson(m);
     }).toList();
   }
+
+  // ── Email-change workflow ────────────────────────────────────
+
+  /// Request an email change. Sets profile status to
+  /// `email_change_pending:<newEmail>` so the admin can approve.
+  Future<void> requestEmailChange(String newEmail) async {
+    final uid = SupabaseService.currentUserId!;
+    final profile = await _db.from('profiles')
+        .select('status')
+        .eq('id', uid)
+        .single();
+    final status = (profile as Map<String, dynamic>)['status'] as String? ?? '';
+
+    if (status == 'approved_email_changed') {
+      throw Exception(
+          'Email has already been changed once. No further changes allowed.');
+    }
+    if (status.startsWith('email_change_pending:')) {
+      throw Exception('An email change request is already pending.');
+    }
+
+    await _db.from('profiles')
+        .update({'status': 'email_change_pending:$newEmail'})
+        .eq('id', uid);
+  }
+
+  /// Cancel a pending email-change request.
+  Future<void> cancelEmailChange() async {
+    final uid = SupabaseService.currentUserId!;
+    await _db.from('profiles')
+        .update({'status': 'approved'})
+        .eq('id', uid);
+  }
+
+  /// Process an admin-approved email change.
+  /// Called automatically when the user's status is
+  /// `email_change_approved:<email>`.
+  Future<void> processApprovedEmailChange(String newEmail) async {
+    final uid = SupabaseService.currentUserId!;
+    // The actual auth email update is done via AuthRepository.updateEmail()
+    // by the caller. Here we just flip the profile status.
+    await _db.from('profiles')
+        .update({'status': 'approved_email_changed'})
+        .eq('id', uid);
+  }
+
+  // ── Admin requests ───────────────────────────────────────────
+
+  /// Get users whose status is 'pending' or 'rejected'.
+  Future<List<UserModel>> getPendingUsers() async {
+    final rows = await _db.from('profiles')
+        .select('id, username, full_name, avatar_url, status, created_at')
+        .inFilter('status', ['pending', 'rejected'])
+        .order('created_at', ascending: false);
+    return (rows as List)
+        .map((r) => UserModel.fromJson(r as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Get users whose status starts with 'email_change_pending:'.
+  Future<List<UserModel>> getEmailChangeRequests() async {
+    final rows = await _db.from('profiles')
+        .select('id, username, full_name, avatar_url, status, created_at')
+        .like('status', 'email_change_pending:%')
+        .order('created_at', ascending: false);
+    return (rows as List)
+        .map((r) => UserModel.fromJson(r as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Approve a user registration — sets status to 'approved'.
+  Future<void> approveUser(String userId) async {
+    await _db.from('profiles')
+        .update({'status': 'approved'})
+        .eq('id', userId);
+  }
+
+  /// Reject a user registration — sets status to 'rejected'.
+  Future<void> rejectUser(String userId) async {
+    await _db.from('profiles')
+        .update({'status': 'rejected'})
+        .eq('id', userId);
+  }
+
+  /// Approve an email-change request.
+  Future<void> approveEmailChange(String userId, String newEmail) async {
+    await _db.from('profiles')
+        .update({'status': 'email_change_approved:$newEmail'})
+        .eq('id', userId);
+  }
+
+  /// Reject an email-change request — revert status to 'approved'.
+  Future<void> rejectEmailChange(String userId) async {
+    await _db.from('profiles')
+        .update({'status': 'approved'})
+        .eq('id', userId);
+  }
 }
