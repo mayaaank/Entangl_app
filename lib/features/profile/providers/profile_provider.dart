@@ -39,9 +39,6 @@ class FollowNotifier extends Notifier<FollowState> {
   FollowState build() => const FollowState();
 
   void init(bool isFollowing, String userId) {
-    // Only reset if switching to a different profile
-    // Prevents revisiting the same profile from wiping
-    // an in-flight optimistic state
     if (state.targetUserId == userId) return;
     state = FollowState(
       isFollowing:   isFollowing,
@@ -55,7 +52,6 @@ class FollowNotifier extends Notifier<FollowState> {
     final prev         = state;
     final nowFollowing = !state.isFollowing;
 
-    // Update instantly
     state = FollowState(
       isFollowing:   nowFollowing,
       followerDelta: nowFollowing
@@ -73,11 +69,8 @@ class FollowNotifier extends Notifier<FollowState> {
           ? await repo.followUser(prev.targetUserId)
           : await repo.unfollowUser(prev.targetUserId);
 
-      // After DB confirms, invalidate cached stats so the
-      // correct count shows on next profile visit
       ref.invalidate(profileStatsProvider(prev.targetUserId));
     } catch (_) {
-      // Revert optimistic state on error
       state = prev;
     }
   }
@@ -146,12 +139,23 @@ class EditProfileNotifier extends Notifier<EditProfileState> {
     if (state.isSaving) return;
     state = state.copyWith(isSaving: true);
     try {
-      await ref.read(usersRepositoryProvider).updateProfile(
-        fullName:   state.fullName,
-        username:   state.username,
-        bio:        state.bio,
-        avatarFile: state.avatarFile,
+      // Pass old URL so repository can evict it from image cache
+      final updatedUser = await ref.read(usersRepositoryProvider).updateProfile(
+        fullName:     state.fullName,
+        username:     state.username,
+        bio:          state.bio,
+        avatarFile:   state.avatarFile,
+        oldAvatarUrl: state.avatarUrl,
       );
+
+      // Invalidate so every widget reading ownProfileProvider
+      // gets fresh data immediately after save
+      ref.invalidate(ownProfileProvider);
+
+      // Also invalidate this user's profile stats so the profile
+      // screen re-renders with the new name/avatar
+      ref.invalidate(profileStatsProvider(updatedUser.id));
+
       state = state.copyWith(isSaving: false, saved: true);
     } catch (e) {
       state = state.copyWith(isSaving: false, error: e.toString());

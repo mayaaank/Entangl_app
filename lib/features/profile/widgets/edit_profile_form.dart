@@ -7,6 +7,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/avatar_widget.dart';
 import '../../../shared/widgets/gradient_button.dart';
 import '../providers/profile_provider.dart';
+import '../screens/crop_avatar_screen.dart';
 
 /// Pure form — reads EditProfileNotifier, calls its methods only.
 class EditProfileForm extends ConsumerStatefulWidget {
@@ -39,13 +40,24 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
     }
   }
 
+  /// Pick → crop → set
   Future<void> _pickAvatar() async {
-    final picked = await ImagePicker()
-        .pickImage(source: ImageSource.gallery, imageQuality: 80);
-    if (picked != null) {
-      ref
-          .read(editProfileProvider.notifier)
-          .setAvatar(File(picked.path));
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 90, // slightly higher quality before crop
+    );
+    if (picked == null || !mounted) return;
+
+    // Push the crop screen and wait for the cropped File (or null if cancelled)
+    final cropped = await Navigator.of(context).push<File>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => CropAvatarScreen(imageFile: File(picked.path)),
+      ),
+    );
+
+    if (cropped != null) {
+      ref.read(editProfileProvider.notifier).setAvatar(cropped);
     }
   }
 

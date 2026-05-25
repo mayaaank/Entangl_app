@@ -33,6 +33,10 @@ class ProfileHeader extends ConsumerWidget {
     // Apply local delta to follower count so it updates instantly
     final displayedFollowers = stats.followerCount + (isOwn ? 0 : followState.followerDelta);
 
+    // Unique hero tag per user so multiple avatars on screen
+    // don't conflict with each other
+    final avatarHeroTag = 'avatar_${stats.user.id}';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -74,7 +78,6 @@ class ProfileHeader extends ConsumerWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  // Avatar — offset up over banner
                   Transform.translate(
                     offset: const Offset(0, -28),
                     child: Container(
@@ -101,7 +104,11 @@ class ProfileHeader extends ConsumerWidget {
                                 right: BorderSide(color: AppColors.inkBase, width: 3.5),
                               ),
                             ),
-                            child: AvatarWidget(imageUrl: stats.user.avatarUrl, size: 72),
+                            child: AvatarWidget(
+                              imageUrl: stats.user.avatarUrl,
+                              size: 72,
+                              heroTag: avatarHeroTag,
+                            ),
                           ),
                           // Mascot badge stacked on avatar
                           Positioned(
@@ -118,7 +125,7 @@ class ProfileHeader extends ConsumerWidget {
                                       expression: GhostExpression.waving,
                                       size: 24,
                                       animate: true,
-                                      )
+                                    )
                                   : const FrogMascot(
                                       expression: FrogExpression.happy,
                                       size: 24,
@@ -131,7 +138,6 @@ class ProfileHeader extends ConsumerWidget {
                     ),
                   ),
                   const Spacer(),
-                  // Action buttons
                   if (isOwn) ...[
                     _OutlineButton(
                       label: 'Edit profile',
@@ -144,7 +150,6 @@ class ProfileHeader extends ConsumerWidget {
                       isDestructive: true,
                     ),
                   ] else
-                    // Follow / Following button — reads local state
                     _FollowButton(
                       isFollowing: isFollowing,
                       onTap: onFollowTap,
@@ -195,18 +200,12 @@ class ProfileHeader extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _Stat(
-                      label: 'Posts',
-                      value: stats.postCount,
-                    ),
+                    _Stat(label: 'Posts',     value: stats.postCount),
                     _Stat(
                       label: 'Followers',
                       value: displayedFollowers.clamp(0, 999999999),
                     ),
-                    _Stat(
-                      label: 'Following',
-                      value: stats.followingCount,
-                    ),
+                    _Stat(label: 'Following', value: stats.followingCount),
                   ],
                 ),
               ),
@@ -223,10 +222,7 @@ class _FollowButton extends ConsumerStatefulWidget {
   final bool isFollowing;
   final VoidCallback? onTap;
 
-  const _FollowButton({
-    required this.isFollowing,
-    this.onTap,
-  });
+  const _FollowButton({required this.isFollowing, this.onTap});
 
   @override
   ConsumerState<_FollowButton> createState() => _FollowButtonState();

@@ -4,6 +4,7 @@ import '../../core/constants/app_constants.dart';
 import '../models/profile_stats_model.dart';
 import '../models/user_model.dart';
 import '../services/supabase_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class UsersRepository {
   final _db = SupabaseService.client;
@@ -57,19 +58,33 @@ class UsersRepository {
     required String username,
     String? bio,
     File?   avatarFile,
+    String? oldAvatarUrl, // passed in so we can evict old cache entry
   }) async {
     final uid = SupabaseService.currentUserId!;
     String? avatarUrl;
+
     if (avatarFile != null) {
-      final ext  = avatarFile.path.split('.').last;
-      final path = '$uid/avatar.$ext';
+      // Use a timestamp suffix so the public URL changes every upload,
+      // which busts CachedNetworkImage's disk + memory cache automatically.
+      final ext       = avatarFile.path.split('.').last;
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final path      = '$uid/avatar_$timestamp.$ext';
+
       await _db.storage.from(AppConstants.avatarsBucket).upload(
             path, avatarFile,
-            fileOptions: FileOptions(upsert: true));
+            fileOptions: const FileOptions(upsert: true));
+
       avatarUrl = _db.storage
           .from(AppConstants.avatarsBucket)
           .getPublicUrl(path);
+
+      // Evict the OLD url from CachedNetworkImage so it doesn't
+      // show the stale image anywhere else in the app.
+      if (oldAvatarUrl != null && oldAvatarUrl.isNotEmpty) {
+        await CachedNetworkImage.evictFromCache(oldAvatarUrl);
+      }
     }
+
     final row = await _db.from('profiles').update({
       'full_name':  fullName,
       'username':   username,
@@ -77,6 +92,7 @@ class UsersRepository {
       if (avatarUrl != null)  'avatar_url': avatarUrl,
       'updated_at': DateTime.now().toIso8601String(),
     }).eq('id', uid).select().single();
+
     return UserModel.fromJson(row as Map<String, dynamic>);
   }
 
