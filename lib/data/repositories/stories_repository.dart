@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import '../models/story_model.dart';
 import '../models/user_model.dart';
 import '../services/supabase_service.dart';
@@ -24,10 +25,15 @@ class StoriesRepository {
         .order('created_at', ascending: false);
 
     final stories = (rows as List)
-        .map((r) => StoryModel.fromJson(
-              r as Map<String, dynamic>,
-              currentUserId: uid,
-            ))
+        .map((r) {
+          debugPrint('ENTANGL story raw: id=${(r as Map)['id']}, '
+              'media_url=${r['media_url']}, '
+              'media_type=${r['media_type']}');
+          return StoryModel.fromJson(
+                r as Map<String, dynamic>,
+                currentUserId: uid,
+              );
+        })
         .toList();
 
     final Map<String, List<StoryModel>> grouped = {};

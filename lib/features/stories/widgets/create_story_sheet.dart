@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/models/story_model.dart';
 import '../providers/stories_provider.dart';
+import '../screens/story_editor_screen.dart';
 
 // 50 MB limit
 const _maxBytes = 50 * 1024 * 1024;
@@ -69,6 +70,40 @@ class _CreateStorySheetState
       return;
     }
 
+    // For images → open the editor
+    if (!isVideo && mounted) {
+      Navigator.pop(context); // close the sheet first
+      final uploaded = await Navigator.of(context).push<bool>(
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) =>
+              StoryEditorScreen(imageFile: File(picked!.path)),
+          transitionsBuilder: (_, anim, __, child) =>
+              FadeTransition(opacity: anim, child: child),
+          transitionDuration: const Duration(milliseconds: 200),
+        ),
+      );
+      if (uploaded == true && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(children: [
+              Icon(Icons.check_circle_outline_rounded,
+                  color: Colors.white, size: 18),
+              SizedBox(width: 10),
+              Text('Story posted! It expires in 24 hours.',
+                  style: TextStyle(color: Colors.white)),
+            ]),
+            backgroundColor: const Color(0xFF1E5C3A),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
+            margin: const EdgeInsets.all(16),
+          ),
+        );
+      }
+      return;
+    }
+
+    // For videos → keep inline preview + direct upload
     if (mounted) {
       setState(() {
         _file = File(picked!.path);
@@ -157,7 +192,7 @@ class _CreateStorySheetState
           ),
           const SizedBox(height: 24),
 
-          // Preview
+          // Preview (video only — images go through editor)
           if (_file != null)
             Container(
               height: 200,
@@ -166,33 +201,24 @@ class _CreateStorySheetState
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
                 color: AppColors.inkWarm,
-                image: _type == StoryMediaType.image
-                    ? DecorationImage(
-                        image: FileImage(_file!),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
               ),
-              child: _type == StoryMediaType.video
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.videocam_rounded,
-                            color: AppColors.cream100, size: 48),
-                        const SizedBox(height: 8),
-                        Text(
-                          _file!.path.split('/').last,
-                          style: TextStyle(
-                            color: AppColors.textSecondary
-                                .withOpacity(0.6),
-                            fontSize: 12,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    )
-                  : null,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.videocam_rounded,
+                      color: AppColors.cream100, size: 48),
+                  const SizedBox(height: 8),
+                  Text(
+                    _file!.path.split('/').last,
+                    style: TextStyle(
+                      color: AppColors.textSecondary.withOpacity(0.6),
+                      fontSize: 12,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
 
           // Pick options

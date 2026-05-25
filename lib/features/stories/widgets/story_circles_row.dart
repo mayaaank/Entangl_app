@@ -101,6 +101,7 @@ class _StoryCircleState extends State<_StoryCircle> {
                   AvatarWidget(
                     imageUrl: widget.userStory.user.avatarUrl,
                     size: 52,
+                    onTap: widget.onTap,
                   ),
                   // Add badge — bottom right only for own story
                   if (isOwn)

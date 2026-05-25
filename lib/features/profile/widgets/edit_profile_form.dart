@@ -210,8 +210,7 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
     final notifier = ref.read(editProfileProvider.notifier);
     final profile  = ref.watch(ownProfileProvider).valueOrNull;
 
-    final isEmailChangeLocked =
-        _profileStatus == 'approved_email_changed';
+
     final isEmailChangePending =
         _profileStatus.startsWith('email_change_pending:');
     final pendingEmail = isEmailChangePending
@@ -434,16 +433,7 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
             const SizedBox(height: 16),
           ],
 
-          if (isEmailChangeLocked) ...[
-            _InfoCard(
-              icon:       Icons.check_circle_outline_rounded,
-              iconColor:  const Color(0xFF10B981),
-              title:      'Email Already Changed',
-              subtitle:
-                  'You have already used your one-time email change. '
-                  'No further email changes are allowed.',
-            ),
-          ] else if (isEmailChangePending) ...[
+          if (isEmailChangePending) ...[
             _InfoCard(
               icon:       Icons.schedule_rounded,
               iconColor:  const Color(0xFFF59E0B),

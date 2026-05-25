@@ -42,6 +42,9 @@ class _StoryViewerScreenState
   late AnimationController _likeCtrl;
   late Animation<double>   _likeScale;
 
+  // Swipe-down dismiss
+  double _dragOffset = 0.0;
+
   static const _imageDuration = Duration(seconds: 5);
 
   @override
@@ -191,43 +194,73 @@ class _StoryViewerScreenState
     final size   = MediaQuery.of(context).size;
     final topPad = MediaQuery.of(context).padding.top;
 
+    final dragFraction = (_dragOffset / size.height).clamp(0.0, 1.0);
+    final scale   = 1.0 - dragFraction * 0.2;
+    final opacity = 1.0 - dragFraction * 0.6;
+
     return Scaffold(
       // These two lines are critical — allow content behind status bar
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
-      body: SizedBox.expand(
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTapUp: (d) {
-            final x = d.localPosition.dx;
-            if (x < size.width * 0.3) {
-              _prevStory();
-            } else if (x > size.width * 0.7) {
-              _nextStory();
-            } else {
-              _togglePause();
-            }
-          },
-          onLongPressStart: (_) {
-            setState(() => _paused = true);
-            _progressCtrl.stop();
-            _videoCtrl?.pause();
-          },
-          onLongPressEnd: (_) {
-            setState(() => _paused = false);
-            _progressCtrl.forward();
-            _videoCtrl?.play();
-          },
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
+      body: GestureDetector(
+        onVerticalDragUpdate: (d) {
+          if (d.delta.dy > 0 || _dragOffset > 0) {
+            setState(() {
+              _dragOffset = (_dragOffset + d.delta.dy).clamp(0.0, size.height);
+            });
+          }
+        },
+        onVerticalDragEnd: (d) {
+          if (_dragOffset > 120 || d.primaryVelocity! > 800) {
+            Navigator.of(context).pop();
+          } else {
+            setState(() => _dragOffset = 0);
+          }
+        },
+        child: AnimatedContainer(
+          duration: _dragOffset == 0
+              ? const Duration(milliseconds: 200)
+              : Duration.zero,
+          curve: Curves.easeOut,
+          transform: Matrix4.identity()
+            ..translate(0.0, _dragOffset)
+            ..scale(scale),
+          transformAlignment: Alignment.topCenter,
+          child: Opacity(
+            opacity: opacity.clamp(0.0, 1.0),
+            child: SizedBox.expand(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTapUp: (d) {
+                  final x = d.localPosition.dx;
+                  if (x < size.width * 0.3) {
+                    _prevStory();
+                  } else if (x > size.width * 0.7) {
+                    _nextStory();
+                  } else {
+                    _togglePause();
+                  }
+                },
+                onLongPressStart: (_) {
+                  setState(() => _paused = true);
+                  _progressCtrl.stop();
+                  _videoCtrl?.pause();
+                },
+                onLongPressEnd: (_) {
+                  setState(() => _paused = false);
+                  _progressCtrl.forward();
+                  _videoCtrl?.play();
+                },
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
 
-              // ── 1. MEDIA (fills entire screen) ────────────
-              _MediaLayer(
-                story:      story,
-                videoCtrl:  _videoCtrl,
-                videoReady: _videoReady,
-              ),
+                    // ── 1. MEDIA (fills entire screen) ────────────
+                    _MediaLayer(
+                      story:      story,
+                      videoCtrl:  _videoCtrl,
+                      videoReady: _videoReady,
+                    ),
 
               // ── 2. TOP gradient (status bar → below header) ─
               Positioned(
@@ -504,7 +537,10 @@ class _StoryViewerScreenState
           ),
         ),
       ),
-    );
+          ),  // Opacity
+        ),    // AnimatedContainer
+      ),      // outer GestureDetector
+    );       // Scaffold
   }
 
   void _showViewers(BuildContext context, String storyId) async {
