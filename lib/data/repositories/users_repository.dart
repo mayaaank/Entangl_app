@@ -158,10 +158,6 @@ class UsersRepository {
         .single();
     final status = (profile as Map<String, dynamic>)['status'] as String? ?? '';
 
-    if (status == 'approved_email_changed') {
-      throw Exception(
-          'Email has already been changed once. No further changes allowed.');
-    }
     if (status.startsWith('email_change_pending:')) {
       throw Exception('An email change request is already pending.');
     }
@@ -187,7 +183,7 @@ class UsersRepository {
     // The actual auth email update is done via AuthRepository.updateEmail()
     // by the caller. Here we just flip the profile status.
     await _db.from('profiles')
-        .update({'status': 'approved_email_changed'})
+        .update({'status': 'approved'})
         .eq('id', uid);
   }
 

@@ -1,3 +1,14 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.google.gms:google-services:4.4.1")
+        classpath("com.google.firebase:firebase-appdistribution-gradle:5.0.0")
+    }
+}
+
 allprojects {
     repositories {
         google()
