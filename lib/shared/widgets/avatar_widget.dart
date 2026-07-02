@@ -5,8 +5,8 @@ import 'avatar_viewer_screen.dart';
 
 class AvatarWidget extends StatelessWidget {
   final String? imageUrl;
-  final double  size;
-  final bool    showRing;
+  final double size;
+  final bool showRing;
   final VoidCallback? onTap;
   // When set, tapping the avatar opens the full-screen viewer
   // with a Hero animation keyed to this tag.
@@ -26,7 +26,7 @@ class AvatarWidget extends StatelessWidget {
     final hasImage = imageUrl != null && imageUrl!.isNotEmpty;
 
     Widget avatar = Container(
-      width:  size,
+      width: size,
       height: size,
       decoration: const BoxDecoration(
         shape: BoxShape.circle,
@@ -38,7 +38,7 @@ class AvatarWidget extends StatelessWidget {
                 tag: heroTag ?? imageUrl!,
                 child: CachedNetworkImage(
                   imageUrl: imageUrl!,
-                  width:  size,
+                  width: size,
                   height: size,
                   fit: BoxFit.cover,
                   placeholder: (_, __) => Container(
