@@ -41,7 +41,7 @@ class PostsRepository {
           .order('created_at', ascending: false)
           .range(offset, offset + AppConstants.feedPageSize - 1);
 
-      debugPrint('ENTANGL: fetched ${(rows as List).length} posts');
+      debugPrint('CONNECT: fetched ${(rows as List).length} posts');
 
       return (rows as List)
           .map((r) => PostModel.fromJson(
@@ -50,8 +50,8 @@ class PostsRepository {
               ))
           .toList();
     } catch (e, st) {
-      debugPrint('ENTANGL ERROR getFeedPosts: $e');
-      debugPrint('ENTANGL STACK: $st');
+      debugPrint('CONNECT ERROR getFeedPosts: $e');
+      debugPrint('CONNECT STACK: $st');
       rethrow;
     }
   }
@@ -89,7 +89,7 @@ class PostsRepository {
           .order('created_at', ascending: false)
           .range(offset, offset + AppConstants.feedPageSize - 1);
 
-      debugPrint('ENTANGL: fetched ${(rows as List).length} user posts');
+      debugPrint('CONNECT: fetched ${(rows as List).length} user posts');
 
       return (rows as List)
           .map((r) => PostModel.fromJson(
@@ -98,8 +98,8 @@ class PostsRepository {
               ))
           .toList();
     } catch (e, st) {
-      debugPrint('ENTANGL ERROR getUserPosts: $e');
-      debugPrint('ENTANGL STACK: $st');
+      debugPrint('CONNECT ERROR getUserPosts: $e');
+      debugPrint('CONNECT STACK: $st');
       rethrow;
     }
   }

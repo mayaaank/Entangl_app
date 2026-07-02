@@ -75,7 +75,7 @@ class FeedNotifier extends AsyncNotifier<List<PostModel>> {
         state = AsyncData([...current, ..._applyPending(more)]);
       }
     } catch (e) {
-      debugPrint('ENTANGL loadMore error: $e');
+      debugPrint('CONNECT loadMore error: $e');
     }
   }
 
@@ -119,7 +119,7 @@ class FeedNotifier extends AsyncNotifier<List<PostModel>> {
       _likedIds.remove(postId);
       _unlikedIds.remove(postId);
     }).catchError((e) {
-      debugPrint('ENTANGL like error: $e');
+      debugPrint('CONNECT like error: $e');
       _likedIds.remove(postId);
       _unlikedIds.remove(postId);
       _dislikedIds.remove(postId);
@@ -175,7 +175,7 @@ class FeedNotifier extends AsyncNotifier<List<PostModel>> {
       _dislikedIds.remove(postId);
       _undislikedIds.remove(postId);
     }).catchError((e) {
-      debugPrint('ENTANGL dislike error: $e');
+      debugPrint('CONNECT dislike error: $e');
       _dislikedIds.remove(postId);
       _undislikedIds.remove(postId);
       _likedIds.remove(postId);
@@ -195,7 +195,7 @@ class FeedNotifier extends AsyncNotifier<List<PostModel>> {
     try {
       await ref.read(postsRepositoryProvider).deletePost(postId);
     } catch (e) {
-      debugPrint('ENTANGL deletePost error: $e');
+      debugPrint('CONNECT deletePost error: $e');
       refresh();
     }
   }

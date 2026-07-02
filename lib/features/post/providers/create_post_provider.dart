@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/repositories/posts_repository.dart';
 import '../../feed/providers/feed_provider.dart';
 
 const _maxChars = 500;

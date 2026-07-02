@@ -42,7 +42,7 @@ class _FeedListState extends ConsumerState<FeedList> {
     return feedAsync.when(
       loading: () => const Center(
         child: CircularProgressIndicator(
-            color: AppColors.primary, strokeWidth: 2),
+            color: AppColors.cream100, strokeWidth: 2),
       ),
       error: (e, _) => Center(
         child: Padding(
@@ -51,17 +51,17 @@ class _FeedListState extends ConsumerState<FeedList> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.errorContainer.withOpacity(0.15),
+                color: AppColors.dislike.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(Icons.wifi_off_rounded,
-                  color: AppColors.error, size: 32),
+                  color: AppColors.dislike, size: 32),
             ),
             const SizedBox(height: 16),
             Text(
               e.toString(),
               style: TextStyle(
-                color: AppColors.onSurfaceVariantDark
+                color: AppColors.textSecondary
                     .withOpacity(0.6),
                 fontSize: 13,
               ),
@@ -76,12 +76,12 @@ class _FeedListState extends ConsumerState<FeedList> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 24, vertical: 10),
                 decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
+                  color: AppColors.cream100,
                   borderRadius: BorderRadius.circular(100),
                 ),
                 child: const Text('Retry',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textOnCream,
                       fontWeight: FontWeight.w600,
                     )),
               ),
@@ -96,24 +96,24 @@ class _FeedListState extends ConsumerState<FeedList> {
                 children: [
                   Container(
                     width: 72, height: 72,
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceContainerHigh,
+                    decoration: const BoxDecoration(
+                      color: AppColors.inkWarm,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.auto_awesome_rounded,
-                        color: AppColors.primary, size: 32),
+                        color: AppColors.cream100, size: 32),
                   ),
                   const SizedBox(height: 20),
                   const Text('Nothing here yet',
                       style: TextStyle(
-                        color: AppColors.onSurfaceDark,
+                        color: AppColors.textPrimary,
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                       )),
                   const SizedBox(height: 8),
                   Text('Be the first to post something',
                       style: TextStyle(
-                        color: AppColors.onSurfaceVariantDark
+                        color: AppColors.textSecondary
                             .withOpacity(0.5),
                         fontSize: 14,
                       )),
@@ -125,20 +125,13 @@ class _FeedListState extends ConsumerState<FeedList> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 28, vertical: 12),
                       decoration: BoxDecoration(
-                        gradient: AppColors.primaryGradient,
+                        color: AppColors.cream100,
                         borderRadius: BorderRadius.circular(100),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.gradientStart
-                                .withOpacity(0.3),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
+                        boxShadow: AppColors.shadowCard,
                       ),
                       child: const Text('Create post',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textOnCream,
                             fontWeight: FontWeight.w600,
                             fontSize: 15,
                           )),
@@ -148,8 +141,8 @@ class _FeedListState extends ConsumerState<FeedList> {
               ),
             )
           : RefreshIndicator(
-              color: AppColors.primary,
-              backgroundColor: AppColors.surfaceContainerLow,
+              color: AppColors.cream100,
+              backgroundColor: AppColors.inkMid,
               onRefresh: () =>
                   ref.read(feedProvider.notifier).refresh(),
               child: ListView.builder(
@@ -167,7 +160,7 @@ class _FeedListState extends ConsumerState<FeedList> {
                           width: 20, height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 1.5,
-                            color: AppColors.primary,
+                            color: AppColors.cream100,
                           ),
                         ),
                       ),
