@@ -442,65 +442,110 @@ Widget build(BuildContext context) {
         top: BorderSide(
           color: AppColors.outlineVariant.withOpacity(0.12)),
       ),
-    ),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Reply banner
-        if (inputState.replyingToId != null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(children: [
-              Container(
-                width: 3, height: 16,
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Replying to ${inputState.replyingToName}',
-                style: TextStyle(
-                  color: AppColors.primary.withOpacity(0.8),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const Spacer(),
-              GestureDetector(
-                onTap: inputNotifier.clearReply,
-                child: Icon(Icons.close,
-                    size: 14,
-                    color: AppColors.onSurfaceVariantDark
-                        .withOpacity(0.5)),
-              ),
-            ]),
+      decoration: const BoxDecoration(
+        color: AppColors.inkMid,
+        border: Border(
+          top: BorderSide(
+            color: AppColors.borderSubtle,
+            width: 0.5,
           ),
-        Row(children: [
-          Expanded(
-            child: TextField(
-              controller: _ctrl,
-              onChanged:  inputNotifier.setText,
-              style: const TextStyle(
-                  color: AppColors.onSurfaceDark,
-                  fontSize: 14),
-              decoration: InputDecoration(
-                hintText: 'Add a comment...',
-                hintStyle: TextStyle(
-                  color: AppColors.onSurfaceVariantDark
-                      .withOpacity(0.4),
-                  fontSize: 14,
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Reply banner
+          if (inputState.replyingToId != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(children: [
+                Container(
+                  width: 3, height: 16,
+                  decoration: BoxDecoration(
+                    color: AppColors.cream100,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-                filled:      true,
-                fillColor:   AppColors.surfaceContainerHigh,
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 10),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(100),
-                  borderSide: BorderSide.none,
+                const SizedBox(width: 8),
+                Text(
+                  'Replying to ${inputState.replyingToName}',
+                  style: const TextStyle(
+                    color: AppColors.cream100,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: inputNotifier.clearReply,
+                  child: const Icon(Icons.close,
+                      size: 14,
+                      color: AppColors.textSecondary),
+                ),
+              ]),
+            ),
+          Row(children: [
+            Expanded(
+              child: TextField(
+                controller: _ctrl,
+                onChanged:  inputNotifier.setText,
+                style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'Add a comment...',
+                  hintStyle: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14,
+                  ),
+                  filled:      true,
+                  fillColor:   AppColors.paperAsh,
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 10),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(100),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            GestureDetector(
+              onTap: inputState.isSubmitting
+                  ? null
+                  : () async {
+                      await inputNotifier.submit(
+                          widget.postId, commentsNotifier);
+                      // Clear the text field visually
+                      _ctrl.clear();
+                      widget.onCommentAdded?.call();
+                    },
+              child: Container(
+                width: 42, height: 42,
+                decoration: BoxDecoration(
+                  color: inputState.text.trim().isEmpty
+                      ? AppColors.paperAsh
+                      : AppColors.cream100,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.borderSubtle,
+                    width: 0.5,
+                  ),
+                ),
+                child: inputState.isSubmitting
+                    ? const Padding(
+                        padding: EdgeInsets.all(10),
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.textOnCream))
+                    : Icon(
+                        Icons.send_rounded,
+                        color: inputState.text.trim().isEmpty
+                            ? AppColors.textMuted
+                            : AppColors.textOnCream,
+                        size: 18,
+                      ),
               ),
             ),
           ),
