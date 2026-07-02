@@ -1,0 +1,11 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Peeking ghost -->
+  <path d="M 20 100 C 20 65 30 35 50 35 C 70 35 80 65 80 100 Z" fill="#FFFFFF" stroke="#111111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Peeking hands resting on bottom boundary -->
+  <path d="M 30 100 C 30 94 36 94 36 100 M 64 100 C 64 94 70 94 70 100" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Curious eyes looking up -->
+  <circle cx="43" cy="55" r="3.5" fill="#111111"/>
+  <circle cx="57" cy="55" r="3.5" fill="#111111"/>
+  <!-- Smile -->
+  <path d="M 47 64 Q 50 68 53 64" fill="none" stroke="#111111" stroke-width="3" stroke-linecap="round"/>
+</svg>

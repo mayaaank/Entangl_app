@@ -1,0 +1,15 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Jumping extended body -->
+  <path d="M 50 25 C 35 25 32 38 32 58 C 32 72 38 78 50 78 C 62 78 68 72 68 58 C 68 38 65 25 50 25 Z" fill="#4ADE80" stroke="#111111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="38" cy="27" r="9" fill="#4ADE80" stroke="#111111" stroke-width="3.5"/>
+  <circle cx="62" cy="27" r="9" fill="#4ADE80" stroke="#111111" stroke-width="3.5"/>
+  <circle cx="38" cy="27" r="3.5" fill="#111111"/>
+  <circle cx="62" cy="27" r="3.5" fill="#111111"/>
+  <circle cx="36" cy="25" r="1.5" fill="#FFFFFF"/>
+  <circle cx="60" cy="25" r="1.5" fill="#FFFFFF"/>
+  <!-- Surprised open mouth -->
+  <circle cx="50" cy="52" r="5" fill="#111111"/>
+  <!-- Extended jumping limbs -->
+  <path d="M 32 50 L 18 40 M 68 50 L 82 40" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 35 76 L 22 92 M 65 76 L 78 92" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

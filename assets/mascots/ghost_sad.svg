@@ -1,0 +1,10 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <path d="M 50 15 C 30 15 25 35 25 55 C 25 70 30 75 35 75 C 40 75 42 70 45 70 C 48 70 50 75 55 75 C 60 75 62 70 65 70 C 68 70 70 75 75 75 C 80 75 75 60 75 55 C 75 35 70 15 50 15 Z" fill="#FFFFFF" stroke="#111111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Arms down -->
+  <path d="M 26 50 C 20 54 20 62 22 66" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 74 50 C 80 54 80 62 78 66" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Drooping/downcast eyes -->
+  <path d="M 40 43 L 46 39 M 60 43 L 54 39" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Downturned mouth -->
+  <path d="M 46 54 Q 50 49 54 54" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

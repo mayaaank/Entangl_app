@@ -1,0 +1,11 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Leaning body -->
+  <path d="M 45 15 C 28 17 20 37 22 55 C 23 70 28 75 33 74 C 38 73 41 68 44 69 C 47 70 49 75 54 74 C 59 73 61 68 64 69 C 67 70 69 75 74 74 C 79 73 76 58 75 53 C 73 33 65 13 45 15 Z" fill="#FFFFFF" stroke="#111111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Leaning dancing arms -->
+  <path d="M 24 48 C 16 53 14 62 18 65" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 73 45 C 80 38 85 28 89 25" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Happy eyes -->
+  <circle cx="41" cy="38" r="3.5" fill="#111111"/>
+  <circle cx="55" cy="38" r="3.5" fill="#111111"/>
+  <path d="M 45 46 Q 49 51 52 46" fill="none" stroke="#111111" stroke-width="3" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,20 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sitting frog body -->
+  <path d="M 50 30 C 35 30 30 45 30 65 C 30 78 35 85 50 85 C 65 85 70 78 70 65 C 70 45 65 30 50 30 Z" fill="#4ADE80" stroke="#111111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Frog eyes (on top of head) -->
+  <circle cx="38" cy="32" r="9" fill="#4ADE80" stroke="#111111" stroke-width="3.5"/>
+  <circle cx="62" cy="32" r="9" fill="#4ADE80" stroke="#111111" stroke-width="3.5"/>
+  <circle cx="38" cy="32" r="3.5" fill="#111111"/>
+  <circle cx="62" cy="32" r="3.5" fill="#111111"/>
+  <circle cx="36" cy="30" r="1.5" fill="#FFFFFF"/>
+  <circle cx="60" cy="30" r="1.5" fill="#FFFFFF"/>
+  <!-- Cheek blush -->
+  <ellipse cx="34" cy="55" rx="3" ry="2" fill="#F472B6" opacity="0.6"/>
+  <ellipse cx="66" cy="55" rx="3" ry="2" fill="#F472B6" opacity="0.6"/>
+  <!-- Closed friendly smile -->
+  <path d="M 42 58 Q 50 63 58 58" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Short front limbs resting -->
+  <path d="M 40 85 Q 43 70 43 65 M 60 85 Q 57 70 57 65" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Folded hind legs on sides -->
+  <path d="M 30 70 Q 20 70 23 85 L 30 85 M 70 70 Q 80 70 77 85 L 70 85" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

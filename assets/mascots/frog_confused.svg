@@ -1,0 +1,14 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <path d="M 50 30 C 35 30 30 45 30 65 C 30 78 35 85 50 85 C 65 85 70 78 70 65 C 70 45 65 30 50 30 Z" fill="#4ADE80" stroke="#111111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Unequal confused eyes -->
+  <circle cx="38" cy="32" r="8" fill="#4ADE80" stroke="#111111" stroke-width="3.5"/>
+  <circle cx="62" cy="32" r="11" fill="#4ADE80" stroke="#111111" stroke-width="3.5"/>
+  <!-- Left eye small dot, right eye big dot -->
+  <circle cx="38" cy="32" r="2.5" fill="#111111"/>
+  <circle cx="62" cy="32" r="5" fill="#111111"/>
+  <!-- Slanted mouth -->
+  <path d="M 43 60 L 57 54" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Arms scratching head -->
+  <path d="M 30 60 Q 22 68 25 76" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 70 60 Q 80 50 72 40 Q 66 38 68 44" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

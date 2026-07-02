@@ -1,0 +1,13 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body outline with white fill and bold black stroke -->
+  <path d="M 50 15 C 30 15 25 35 25 55 C 25 70 30 75 35 75 C 40 75 42 70 45 70 C 48 70 50 75 55 75 C 60 75 62 70 65 70 C 68 70 70 75 75 75 C 80 75 75 60 75 55 C 75 35 70 15 50 15 Z" fill="#FFFFFF" stroke="#111111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Left arm at rest -->
+  <path d="M 26 50 C 18 53 18 60 22 62" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Right arm raised in a wave -->
+  <path d="M 74 48 C 82 43 85 30 89 25" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Small dot eyes -->
+  <circle cx="43" cy="40" r="3.5" fill="#111111"/>
+  <circle cx="57" cy="40" r="3.5" fill="#111111"/>
+  <!-- Half-moon smile -->
+  <path d="M 47 50 C 47 53 53 53 53 50" fill="none" stroke="#111111" stroke-width="3" stroke-linecap="round"/>
+</svg>

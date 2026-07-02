@@ -1,0 +1,13 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <path d="M 50 30 C 35 30 30 45 30 65 C 30 78 35 85 50 85 C 65 85 70 78 70 65 C 70 45 65 30 50 30 Z" fill="#4ADE80" stroke="#111111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="38" cy="32" r="9" fill="#4ADE80" stroke="#111111" stroke-width="3.5"/>
+  <circle cx="62" cy="32" r="9" fill="#4ADE80" stroke="#111111" stroke-width="3.5"/>
+  <circle cx="38" cy="32" r="3.5" fill="#111111"/>
+  <circle cx="62" cy="32" r="3.5" fill="#111111"/>
+  <!-- Smile -->
+  <path d="M 42 58 Q 50 63 58 58" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Left arm down -->
+  <path d="M 30 60 Q 22 68 25 76" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Right arm waving -->
+  <path d="M 70 52 Q 82 42 86 32" fill="none" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
+</svg>
