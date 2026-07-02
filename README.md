@@ -1,6 +1,6 @@
-# entangl_app
+# Connect App
 
-A new Flutter project.
+Connect is a modern social media platform built with Flutter and powered by Supabase.
 
 ## Getting Started
 
