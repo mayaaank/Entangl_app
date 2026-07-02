@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../shared/widgets/connect_app_bar.dart';
+import '../../../shared/widgets/entangl_app_bar.dart';
 import '../../../shared/widgets/mascot_widgets.dart';
 import '../providers/notifications_provider.dart';
 import '../widgets/notification_tile.dart';
@@ -19,7 +19,7 @@ class NotificationsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.inkBase,
-      appBar: ConnectAppBar(
+      appBar: EntanglAppBar(
         leading: IconButton(
           onPressed: () => context.pop(),
           icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary, size: 20),

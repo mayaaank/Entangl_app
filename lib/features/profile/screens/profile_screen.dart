@@ -6,7 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../data/models/post_model.dart';
 import '../../../data/services/supabase_service.dart';
-import '../../../shared/widgets/connect_nav_bar.dart';
+import '../../../shared/widgets/entangl_nav_bar.dart';
 import '../../../shared/widgets/post_card.dart';
 import '../../../shared/widgets/mascot_widgets.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -181,7 +181,7 @@ class _ProfileScaffoldState extends ConsumerState<_ProfileScaffold>
         },
       ),
       bottomNavigationBar: widget.isOwn
-          ? ConnectNavBar(
+          ? EntanglNavBar(
               currentIndex: 2,
               onTap: (i) {
                 switch (i) {

@@ -93,6 +93,10 @@ class AppColors {
     end: Alignment.bottomRight,
   );
 
+  static const Color gradientStart = Color(0xFF6D28D9);
+  static const Color gradientEnd   = Color(0xFFDB2777);
+  static const LinearGradient primaryGradient = brandGradient;
+
   // ── Legacy mappings for compatibility ──────────────────────────────
   static const Color primary = cream100;
   static const Color primaryContainer = cream60;

@@ -6,7 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../data/models/post_model.dart';
 import '../../../features/stories/widgets/story_circles_row.dart';
-import '../../../shared/widgets/connect_nav_bar.dart';
+import '../../../shared/widgets/entangl_nav_bar.dart';
 import '../../../shared/widgets/gradient_text.dart';
 import '../../../shared/widgets/post_card.dart';
 import '../../../shared/widgets/mascot_widgets.dart';
@@ -24,7 +24,7 @@ class HomeScreen extends ConsumerWidget {
       backgroundColor: AppColors.inkBase,
       extendBody: true,
       body: const _HomeBody(),
-      bottomNavigationBar: ConnectNavBar(
+      bottomNavigationBar: EntanglNavBar(
         currentIndex: 0,
         onTap: (i) {
           switch (i) {
@@ -113,7 +113,7 @@ class _HomeBodyState extends ConsumerState<_HomeBody> {
                       child: Row(
                         children: [
                           GradientText(
-                            'connect',
+                            'entangl',
                             style: AppTextStyles.displayLg.copyWith(
                               fontSize: 26,
                               fontWeight: FontWeight.w800,

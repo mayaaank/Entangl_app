@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 
-// Simplified to solid cream text for the Connect brand wordmark
+// Simplified to solid cream text for the Entangl brand wordmark
 class GradientText extends StatelessWidget {
   final String text;
   final TextStyle? style;

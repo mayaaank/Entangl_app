@@ -187,8 +187,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Text(
-                            'Join Connect today',
+                           Text(
+                            'Join Entangl today',
                             style: AppTextStyles.bodySmall.copyWith(
                               color: AppColors.textTertiary,
                             ),

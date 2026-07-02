@@ -5,11 +5,11 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/theme/app_colors.dart';
 import 'mascot_widgets.dart';
 
-class ConnectNavBar extends StatelessWidget {
+class EntanglNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  const ConnectNavBar({
+  const EntanglNavBar({
     super.key,
     required this.currentIndex,
     required this.onTap,

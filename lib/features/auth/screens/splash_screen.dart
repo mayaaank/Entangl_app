@@ -128,9 +128,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                // Subtitle "connect" lowercase, whispered spacing
+                // Subtitle "entangl" lowercase, whispered spacing
                 Text(
-                  'connect',
+                  'entangl',
                   style: AppTextStyles.labelSmall.copyWith(
                     color: AppColors.textTertiary,
                     fontSize: 16,

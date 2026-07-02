@@ -5,13 +5,13 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import 'gradient_text.dart';
 
-class ConnectAppBar extends ConsumerWidget implements PreferredSizeWidget {
+class EntanglAppBar extends ConsumerWidget implements PreferredSizeWidget {
   final VoidCallback? onSettingsTap;
   final Widget? trailing;
   final Widget? leading;
   final String? title;
 
-  const ConnectAppBar({
+  const EntanglAppBar({
     super.key,
     this.onSettingsTap,
     this.trailing,
@@ -51,12 +51,12 @@ class ConnectAppBar extends ConsumerWidget implements PreferredSizeWidget {
                 Text(
                   title!,
                   style: AppTextStyles.title2.copyWith(
-                    color: AppColors.textPrimary,
+                     color: AppColors.textPrimary,
                   ),
                 )
               else
                 GradientText(
-                  'Connect',
+                  'Entangl',
                   style: AppTextStyles.brandName,
                 ),
               const Spacer(),

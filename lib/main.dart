@@ -14,18 +14,18 @@ Future<void> main() async {
     anonKey: Secrets.supabaseAnonKey,
   );
 
-  runApp(const ProviderScope(child: ConnectApp()));
+  runApp(const ProviderScope(child: EntanglApp()));
 }
 
-class ConnectApp extends ConsumerWidget {
-  const ConnectApp({super.key});
+class EntanglApp extends ConsumerWidget {
+  const EntanglApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
-      title:            'Connect',
+      title:            'Entangl',
       debugShowCheckedModeBanner: false,
       theme:            AppTheme.dark,
       routerConfig:     router,
