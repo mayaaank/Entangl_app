@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../data/models/story_model.dart';
 import '../../../data/services/supabase_service.dart';
 import '../../../shared/widgets/avatar_widget.dart';
+import '../../../shared/widgets/mascot_widgets.dart';
 import '../providers/stories_provider.dart';
 
 class StoryViewerScreen extends ConsumerStatefulWidget {
@@ -34,6 +37,7 @@ class _StoryViewerScreenState
   VideoPlayerController?   _videoCtrl;
   bool                     _videoReady = false;
   bool                     _paused     = false;
+  bool                     _showHeartGhost = false;
 
   late AnimationController _likeCtrl;
   late Animation<double>   _likeScale;
@@ -161,6 +165,12 @@ class _StoryViewerScreenState
 
   void _animateLike() {
     _likeCtrl.forward().then((_) => _likeCtrl.reverse());
+    setState(() => _showHeartGhost = true);
+    Future.delayed(const Duration(milliseconds: 1400), () {
+      if (mounted) {
+        setState(() => _showHeartGhost = false);
+      }
+    });
     ref.read(storiesProvider.notifier).toggleLike(_curStory.id);
   }
 
@@ -265,19 +275,26 @@ class _StoryViewerScreenState
                     (i) => Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 2),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(2),
-                          child: LinearProgressIndicator(
-                            value: i < _storyIndex
+                        child: Container(
+                          height: 3.5,
+                          decoration: BoxDecoration(
+                            color: AppColors.cream08,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: FractionallySizedBox(
+                            alignment: Alignment.centerLeft,
+                            widthFactor: i < _storyIndex
                                 ? 1.0
                                 : i == _storyIndex
                                     ? _progressCtrl.value
                                     : 0.0,
-                            backgroundColor:
-                                Colors.white.withOpacity(0.35),
-                            valueColor:
-                                const AlwaysStoppedAnimation(Colors.white),
-                            minHeight: 2.5,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.cream100,
+                                borderRadius: BorderRadius.circular(4),
+                                boxShadow: AppColors.shadowCard,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -379,14 +396,12 @@ class _StoryViewerScreenState
                               horizontal: 32, vertical: 12),
                           decoration: BoxDecoration(
                             color: story.isLiked
-                                ? const Color(0xFFFF4D6D)
-                                    .withOpacity(0.22)
+                                ? AppColors.heart.withOpacity(0.22)
                                 : Colors.white.withOpacity(0.14),
                             borderRadius: BorderRadius.circular(100),
                             border: Border.all(
                               color: story.isLiked
-                                  ? const Color(0xFFFF4D6D)
-                                      .withOpacity(0.7)
+                                  ? AppColors.heart.withOpacity(0.7)
                                   : Colors.white.withOpacity(0.25),
                               width: 1.2,
                             ),
@@ -399,7 +414,7 @@ class _StoryViewerScreenState
                                     ? Icons.favorite_rounded
                                     : Icons.favorite_outline_rounded,
                                 color: story.isLiked
-                                    ? const Color(0xFFFF4D6D)
+                                    ? AppColors.heart
                                     : Colors.white,
                                 size: 22,
                               ),
@@ -409,7 +424,7 @@ class _StoryViewerScreenState
                                   '${story.likeCount}',
                                   style: TextStyle(
                                     color: story.isLiked
-                                        ? const Color(0xFFFF4D6D)
+                                        ? AppColors.heart
                                         : Colors.white,
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
@@ -433,7 +448,7 @@ class _StoryViewerScreenState
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(Icons.favorite_rounded,
-                          color: Color(0xFFFF4D6D), size: 18),
+                          color: AppColors.heart, size: 18),
                       const SizedBox(width: 6),
                       Text(
                         '${story.likeCount} like${story.likeCount == 1 ? '' : 's'}',
@@ -446,6 +461,45 @@ class _StoryViewerScreenState
                     ],
                   ),
                 ),
+            if (_showHeartGhost)
+              Positioned.fill(
+                child: Container(
+                  color: Colors.black.withOpacity(0.3),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Animate(
+                          child: const GhostMascot(
+                            expression: GhostExpression.dancing,
+                            size: 160,
+                            animate: true,
+                          ),
+                        ).scale(
+                          begin: const Offset(0.5, 0.5),
+                          end: const Offset(1.0, 1.0),
+                          duration: 500.ms,
+                          curve: Curves.elasticOut,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Liked!',
+                          style: AppTextStyles.displayMd.copyWith(
+                            color: Colors.white,
+                            fontSize: 24,
+                            shadows: [
+                              const Shadow(
+                                color: Colors.black,
+                                blurRadius: 8,
+                              ),
+                            ],
+                          ),
+                        ).animate().fadeIn(duration: 300.ms),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -541,7 +595,7 @@ class _OwnerMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
-      color: AppColors.surfaceContainerHigh,
+      color: AppColors.inkMid,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14)),
       icon: Container(
@@ -562,7 +616,7 @@ class _OwnerMenuButton extends StatelessWidget {
           value: 'viewers',
           child: Row(children: [
             Icon(Icons.visibility_outlined,
-                size: 18, color: AppColors.primary),
+                size: 18, color: AppColors.cream100),
             SizedBox(width: 10),
             Text('View viewers'),
           ]),
@@ -571,10 +625,10 @@ class _OwnerMenuButton extends StatelessWidget {
           value: 'delete',
           child: Row(children: [
             Icon(Icons.delete_outline_rounded,
-                size: 18, color: AppColors.error),
+                size: 18, color: AppColors.dislike),
             SizedBox(width: 10),
             Text('Delete story',
-                style: TextStyle(color: AppColors.error)),
+                style: TextStyle(color: AppColors.dislike)),
           ]),
         ),
       ],
@@ -591,7 +645,7 @@ class _ViewersSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: AppColors.inkMid,
         borderRadius:
             BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -603,7 +657,7 @@ class _ViewersSheet extends StatelessWidget {
           Container(
             width: 36, height: 3,
             decoration: BoxDecoration(
-              color: AppColors.outlineVariant.withOpacity(0.4),
+              color: AppColors.textMuted.withOpacity(0.4),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -612,12 +666,12 @@ class _ViewersSheet extends StatelessWidget {
                 horizontal: 20, vertical: 14),
             child: Row(children: [
               const Icon(Icons.visibility_outlined,
-                  color: AppColors.primary, size: 20),
+                  color: AppColors.cream100, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Viewed by ${viewers.length}',
                 style: const TextStyle(
-                  color: AppColors.onSurfaceDark,
+                  color: AppColors.textPrimary,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
@@ -630,7 +684,7 @@ class _ViewersSheet extends StatelessWidget {
               child: Text(
                 'No views yet',
                 style: TextStyle(
-                  color: AppColors.onSurfaceVariantDark
+                  color: AppColors.textSecondary
                       .withOpacity(0.5),
                   fontSize: 14,
                 ),
@@ -645,23 +699,23 @@ class _ViewersSheet extends StatelessWidget {
                   backgroundImage:
                       url != null ? NetworkImage(url) : null,
                   backgroundColor:
-                      AppColors.surfaceContainerHigh,
+                      AppColors.inkWarm,
                   child: url == null
                       ? const Icon(Icons.person,
-                          color: AppColors.outlineVariant)
+                          color: AppColors.textMuted)
                       : null,
                 ),
                 title: Text(
                   user.fullName as String,
                   style: const TextStyle(
-                      color: AppColors.onSurfaceDark,
+                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.w600,
                       fontSize: 14),
                 ),
                 subtitle: Text(
                   '@${user.username}',
                   style: const TextStyle(
-                      color: AppColors.onSurfaceVariantDark,
+                      color: AppColors.textSecondary,
                       fontSize: 12),
                 ),
               );

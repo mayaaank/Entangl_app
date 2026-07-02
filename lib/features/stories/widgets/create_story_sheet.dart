@@ -58,7 +58,7 @@ class _CreateStorySheetState
                 ),
               ),
             ]),
-            backgroundColor: AppColors.errorContainer,
+            backgroundColor: AppColors.dislike,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12)),
@@ -109,7 +109,7 @@ class _CreateStorySheetState
           ..showSnackBar(SnackBar(
             content: Text(next.error!,
                 style: const TextStyle(color: Colors.white)),
-            backgroundColor: AppColors.errorContainer,
+            backgroundColor: AppColors.dislike,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12)),
@@ -124,7 +124,7 @@ class _CreateStorySheetState
         top: 8, left: 24, right: 24,
       ),
       decoration: const BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: AppColors.inkMid,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
@@ -135,7 +135,7 @@ class _CreateStorySheetState
             child: Container(
               width: 36, height: 3,
               decoration: BoxDecoration(
-                color: AppColors.outlineVariant.withOpacity(0.4),
+                color: AppColors.textMuted.withOpacity(0.4),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -143,7 +143,7 @@ class _CreateStorySheetState
           const SizedBox(height: 20),
           const Text('Add to Story',
               style: TextStyle(
-                color: AppColors.onSurfaceDark,
+                color: AppColors.textPrimary,
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
               )),
@@ -151,7 +151,7 @@ class _CreateStorySheetState
           Text(
             'Disappears after 24 hours · Max 50 MB',
             style: TextStyle(
-              color: AppColors.onSurfaceVariantDark.withOpacity(0.6),
+              color: AppColors.textSecondary.withOpacity(0.6),
               fontSize: 13,
             ),
           ),
@@ -165,7 +165,7 @@ class _CreateStorySheetState
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                color: AppColors.surfaceContainerHigh,
+                color: AppColors.inkWarm,
                 image: _type == StoryMediaType.image
                     ? DecorationImage(
                         image: FileImage(_file!),
@@ -178,12 +178,12 @@ class _CreateStorySheetState
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.videocam_rounded,
-                            color: AppColors.primary, size: 48),
+                            color: AppColors.cream100, size: 48),
                         const SizedBox(height: 8),
                         Text(
                           _file!.path.split('/').last,
                           style: TextStyle(
-                            color: AppColors.onSurfaceVariantDark
+                            color: AppColors.textSecondary
                                 .withOpacity(0.6),
                             fontSize: 12,
                           ),
@@ -231,13 +231,13 @@ class _CreateStorySheetState
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceContainerHigh,
+                      color: AppColors.inkWarm,
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: const Center(
                       child: Text('Change',
                           style: TextStyle(
-                            color: AppColors.onSurfaceDark,
+                            color: AppColors.textPrimary,
                             fontWeight: FontWeight.w600,
                           )),
                     ),
@@ -257,31 +257,25 @@ class _CreateStorySheetState
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
+                      color: AppColors.cream100,
                       borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.gradientStart.withOpacity(0.3),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
+                      boxShadow: AppColors.shadowCard,
                     ),
                     child: Center(
                       child: state.isUploading
                           ? const SizedBox(
                               width: 20, height: 20,
                               child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: Colors.white))
+                                  strokeWidth: 2, color: AppColors.textOnCream))
                           : const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(Icons.auto_awesome,
-                                    color: Colors.white, size: 16),
+                                    color: AppColors.textOnCream, size: 16),
                                 SizedBox(width: 6),
                                 Text('Share Story',
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: AppColors.textOnCream,
                                       fontWeight: FontWeight.w700,
                                     )),
                               ],
@@ -317,19 +311,19 @@ class _PickOption extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 20),
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainerHigh,
+          color: AppColors.inkWarm,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-              color: AppColors.outlineVariant.withOpacity(0.2)),
+              color: AppColors.borderSubtle),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: AppColors.primary, size: 28),
+            Icon(icon, color: AppColors.cream100, size: 28),
             const SizedBox(height: 6),
             Text(label,
                 style: const TextStyle(
-                  color: AppColors.onSurfaceDark,
+                  color: AppColors.textPrimary,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 )),
