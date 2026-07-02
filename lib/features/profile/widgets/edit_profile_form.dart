@@ -59,7 +59,7 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
   Widget build(BuildContext context) {
     if (!_loaded) {
       return const Center(
-          child: CircularProgressIndicator(color: AppColors.primary));
+          child: CircularProgressIndicator(color: AppColors.cream100));
     }
 
     final state    = ref.watch(editProfileProvider);
@@ -88,11 +88,11 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: const BoxDecoration(
-                        gradient: AppColors.primaryGradient,
+                        color: AppColors.cream100,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.camera_alt,
-                          color: Colors.white, size: 16),
+                          color: AppColors.textOnCream, size: 16),
                     ),
                   ),
                 ),
@@ -102,7 +102,7 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
           const SizedBox(height: 8),
           Text('Tap to change photo',
               style: AppTextStyles.labelSmall
-                  .copyWith(color: AppColors.onSurfaceVariantDark)),
+                  .copyWith(color: AppColors.textSecondary)),
           const SizedBox(height: 36),
           _LabeledField(label: 'Full Name', controller: _name,
               onChanged: notifier.setFullName),
@@ -115,7 +115,7 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
             children: [
               Text('Bio'.toUpperCase(),
                   style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.onSurfaceVariantDark,
+                    color: AppColors.textSecondary,
                     letterSpacing: 1.2,
                   )),
               const SizedBox(height: 8),
@@ -124,7 +124,7 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
                 maxLines: 4, maxLength: 160,
                 onChanged: notifier.setBio,
                 style: AppTextStyles.bodyMedium
-                    .copyWith(color: AppColors.onSurfaceDark),
+                    .copyWith(color: AppColors.textPrimary),
                 decoration: const InputDecoration(
                     hintText: 'Tell us about yourself...'),
               ),
@@ -157,7 +157,7 @@ class _LabeledField extends StatelessWidget {
         children: [
           Text(label.toUpperCase(),
               style: const TextStyle(
-                  color: AppColors.onSurfaceVariantDark,
+                  color: AppColors.textSecondary,
                   fontSize: 10,
                   letterSpacing: 1.2,
                   fontWeight: FontWeight.w600)),
@@ -165,7 +165,7 @@ class _LabeledField extends StatelessWidget {
           TextField(
             controller: controller,
             onChanged: onChanged,
-            style: const TextStyle(color: AppColors.onSurfaceDark),
+            style: const TextStyle(color: AppColors.textPrimary),
             decoration: InputDecoration(hintText: label),
           ),
         ],

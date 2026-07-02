@@ -20,7 +20,7 @@ class NotificationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final time     = DateTime.tryParse(notification.createdAt);
+    final time = DateTime.tryParse(notification.createdAt);
     final isUnread = !notification.isRead;
 
     return Dismissible(
@@ -28,64 +28,108 @@ class NotificationTile extends StatelessWidget {
       direction: DismissDirection.endToStart,
       onDismissed: (_) => onDismiss(),
       background: Container(
-        color: AppColors.errorContainer,
+        decoration: BoxDecoration(
+          color: AppColors.dislike.withOpacity(0.12),
+          borderRadius: BorderRadius.circular(16),
+        ),
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
-        child: const Icon(Icons.delete_outline, color: Colors.white),
+        child: const Icon(Icons.delete_outline_rounded, color: AppColors.dislike),
       ),
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 20, vertical: 14),
-          color: isUnread ? AppColors.unreadTint : Colors.transparent,
-          child: Row(children: [
-            if (isUnread)
-              Container(
-                width: 6, height: 6,
-                margin: const EdgeInsets.only(right: 10),
-                decoration: const BoxDecoration(
-                    color: AppColors.primary, shape: BoxShape.circle),
-              )
-            else
-              const SizedBox(width: 16),
-            AvatarWidget(
-                imageUrl: notification.actor?.avatarUrl, size: 44),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(children: [
-                    _typeIcon(notification.type),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        decoration: BoxDecoration(
+          color: isUnread ? AppColors.paperClay : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isUnread ? AppColors.borderSubtle : Colors.transparent,
+            width: 0.5,
+          ),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                if (isUnread)
+                  Container(
+                    width: 6,
+                    height: 6,
+                    margin: const EdgeInsets.only(right: 10),
+                    decoration: const BoxDecoration(
+                      color: AppColors.cream100,
+                      shape: BoxShape.circle,
+                    ),
+                  )
+                else
+                  const SizedBox(width: 16),
+                
+                // Stacked avatar + type badge
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    AvatarWidget(imageUrl: notification.actor?.avatarUrl, size: 44),
+                    Positioned(
+                      bottom: -2,
+                      right: -2,
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: const BoxDecoration(
+                          color: AppColors.inkBase,
+                          shape: BoxShape.circle,
+                          border: Border(
+                            top: BorderSide(color: AppColors.borderSubtle, width: 1),
+                            bottom: BorderSide(color: AppColors.borderSubtle, width: 1),
+                            left: BorderSide(color: AppColors.borderSubtle, width: 1),
+                            right: BorderSide(color: AppColors.borderSubtle, width: 1),
+                          ),
+                        ),
+                        child: _typeIcon(notification.type),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
                         _text(notification),
-                        style: AppTextStyles.bodySmall
-                            .copyWith(color: AppColors.onSurfaceDark),
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textPrimary,
+                          fontSize: 14,
+                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ]),
-                  const SizedBox(height: 3),
-                  Text(
-                    time != null ? timeago.format(time) : '',
-                    style: AppTextStyles.timestamp
-                        .copyWith(fontSize: 11),
+                      const SizedBox(height: 4),
+                      Text(
+                        time != null ? timeago.format(time) : '',
+                        style: AppTextStyles.timestamp.copyWith(
+                          fontSize: 11,
+                          color: AppColors.textTertiary,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 8),
+                if (notification.post?['image_url'] != null)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      notification.post!['image_url'] as String,
+                      width: 40,
+                      height: 40,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+              ],
             ),
-            if (notification.post?['image_url'] != null)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  notification.post!['image_url'] as String,
-                  width: 44, height: 44, fit: BoxFit.cover),
-              ),
-          ]),
+          ),
         ),
       ),
     );
@@ -94,31 +138,31 @@ class NotificationTile extends StatelessWidget {
   Widget _typeIcon(NotificationType t) {
     switch (t) {
       case NotificationType.follow:
-        return const Icon(Icons.person_add_rounded,
-            color: AppColors.primary, size: 14);
+        return const Icon(Icons.person_add_rounded, color: AppColors.notifFollow, size: 12);
       case NotificationType.like:
-        return const Icon(Icons.favorite_rounded,
-            color: Colors.red, size: 14);
+        return const Icon(Icons.favorite_rounded, color: AppColors.notifLike, size: 12);
       case NotificationType.dislike:
-        return const Icon(Icons.thumb_down_rounded,
-            color: Colors.orange, size: 14);
+        return const Icon(Icons.thumb_down_rounded, color: AppColors.notifDislike, size: 12);
       case NotificationType.comment:
-        return const Icon(Icons.chat_bubble_rounded,
-            color: Colors.blue, size: 14);
+        return const Icon(Icons.chat_bubble_rounded, color: AppColors.notifComment, size: 12);
       case NotificationType.reply:
-        return const Icon(Icons.reply_rounded,
-            color: Colors.green, size: 14);
+        return const Icon(Icons.reply_rounded, color: AppColors.notifReply, size: 12);
     }
   }
 
   String _text(NotificationModel n) {
     final name = n.actor?.fullName ?? 'Someone';
     switch (n.type) {
-      case NotificationType.follow:   return '$name started following you';
-      case NotificationType.like:     return '$name liked your post';
-      case NotificationType.dislike:  return '$name disliked your post';
-      case NotificationType.comment:  return '$name commented on your post';
-      case NotificationType.reply:    return '$name replied to your comment';
+      case NotificationType.follow:
+        return '$name started following you';
+      case NotificationType.like:
+        return '$name liked your post';
+      case NotificationType.dislike:
+        return '$name disliked your post';
+      case NotificationType.comment:
+        return '$name commented on your post';
+      case NotificationType.reply:
+        return '$name replied to your comment';
     }
   }
 }

@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../data/models/post_model.dart';
 import '../../../data/services/supabase_service.dart';
-import '../../../shared/widgets/entangl_nav_bar.dart';
+import '../../../shared/widgets/connect_nav_bar.dart';
 import '../../../shared/widgets/post_card.dart';
+import '../../../shared/widgets/mascot_widgets.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/profile_provider.dart';
 import '../widgets/follow_list.dart';
@@ -51,13 +53,8 @@ class _ProfileScaffoldState extends ConsumerState<_ProfileScaffold>
     _tabs = TabController(length: 3, vsync: this);
 
     if (!widget.isOwn) {
-      // MUST be in addPostFrameCallback — calling ref in
-      // initState before the widget is mounted causes the
-      // "dependOnInheritedWidgetOfExactType called before
-      // initState completed" error.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        // Invalidate so we always get fresh isFollowing from DB
         ref.invalidate(profileStatsProvider(widget.userId));
       });
     }
@@ -82,7 +79,7 @@ class _ProfileScaffoldState extends ConsumerState<_ProfileScaffold>
     });
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundDark,
+      backgroundColor: AppColors.inkBase,
       extendBody: true,
       appBar: widget.isOwn
           ? null
@@ -106,21 +103,23 @@ class _ProfileScaffoldState extends ConsumerState<_ProfileScaffold>
       body: statsAsync.when(
         loading: () => const Center(
             child: CircularProgressIndicator(
-                color: AppColors.primary, strokeWidth: 2)),
+                color: AppColors.cream100, strokeWidth: 2)),
         error: (e, _) => Center(
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.person_off_outlined,
-                color: AppColors.outlineVariant, size: 48),
-            const SizedBox(height: 16),
-            Text('Profile not found',
-                style: TextStyle(
-                    color: AppColors.onSurfaceVariantDark
-                        .withOpacity(0.5))),
-          ]),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const FrogMascot(expression: FrogExpression.sad, size: 96),
+              const SizedBox(height: 16),
+              Text(
+                'Profile not found',
+                style: AppTextStyles.displayMd.copyWith(color: AppColors.textPrimary),
+              ),
+            ],
+          ),
         ),
         data: (stats) {
           if (stats == null) {
-            return const Center(child: Text('Profile not found'));
+            return const Center(child: Text('Profile not found', style: TextStyle(color: AppColors.textPrimary)));
           }
           return NestedScrollView(
             headerSliverBuilder: (_, __) => [
@@ -149,11 +148,11 @@ class _ProfileScaffoldState extends ConsumerState<_ProfileScaffold>
                 pinned: true,
                 delegate: _PinnedTabBar(TabBar(
                   controller: _tabs,
-                  indicatorColor: AppColors.primary,
+                  indicatorColor: AppColors.cream60,
                   indicatorWeight: 2,
-                  labelColor: AppColors.onSurfaceDark,
+                  labelColor: AppColors.textPrimary,
                   unselectedLabelColor:
-                      AppColors.onSurfaceVariantDark
+                      AppColors.textSecondary
                           .withOpacity(0.4),
                   labelStyle: const TextStyle(
                       fontSize: 13, fontWeight: FontWeight.w600),
@@ -177,7 +176,7 @@ class _ProfileScaffoldState extends ConsumerState<_ProfileScaffold>
         },
       ),
       bottomNavigationBar: widget.isOwn
-          ? EntanglNavBar(
+          ? ConnectNavBar(
               currentIndex: 2,
               onTap: (i) {
                 switch (i) {
@@ -202,17 +201,17 @@ class _PostsTab extends ConsumerWidget {
     return postsAsync.when(
       loading: () => const Center(
           child: CircularProgressIndicator(
-              color: AppColors.primary, strokeWidth: 2)),
+              color: AppColors.cream100, strokeWidth: 2)),
       error: (_, __) => Center(
           child: Text('Could not load posts',
               style: TextStyle(
-                  color: AppColors.onSurfaceVariantDark
+                  color: AppColors.textSecondary
                       .withOpacity(0.5)))),
       data: (posts) {
         if (posts.isEmpty) {
           return RefreshIndicator(
-            color: AppColors.primary,
-            backgroundColor: AppColors.surfaceContainerLow,
+            color: AppColors.cream100,
+            backgroundColor: AppColors.inkMid,
             onRefresh: () =>
                 ref.refresh(userPostsProvider(userId).future),
             child: ListView(
@@ -221,19 +220,22 @@ class _PostsTab extends ConsumerWidget {
                 SizedBox(
                   height: 300,
                   child: Center(
-                    child: Column(mainAxisSize: MainAxisSize.min,
-                        children: [
-                      Icon(Icons.article_outlined,
-                          color: AppColors.outlineVariant
-                              .withOpacity(0.5),
-                          size: 40),
-                      const SizedBox(height: 12),
-                      Text('No posts yet',
-                          style: TextStyle(
-                              color: AppColors.onSurfaceVariantDark
-                                  .withOpacity(0.5),
-                              fontSize: 14)),
-                    ]),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const GhostMascot(
+                          expression: GhostExpression.floating,
+                          size: 80,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No posts yet',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textTertiary,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -241,8 +243,8 @@ class _PostsTab extends ConsumerWidget {
           );
         }
         return RefreshIndicator(
-          color: AppColors.primary,
-          backgroundColor: AppColors.surfaceContainerLow,
+          color: AppColors.cream100,
+          backgroundColor: AppColors.inkMid,
           onRefresh: () =>
               ref.refresh(userPostsProvider(userId).future),
           child: ListView.builder(
@@ -264,7 +266,7 @@ class _PinnedTabBar extends SliverPersistentHeaderDelegate {
   const _PinnedTabBar(this.tabBar);
   @override
   Widget build(_, __, ___) =>
-      Container(color: AppColors.backgroundDark, child: tabBar);
+      Container(color: AppColors.inkBase, child: tabBar);
   @override double get maxExtent => tabBar.preferredSize.height;
   @override double get minExtent => tabBar.preferredSize.height;
   @override bool shouldRebuild(_) => false;

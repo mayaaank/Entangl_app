@@ -4,14 +4,16 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../data/models/profile_stats_model.dart';
 import '../../../shared/widgets/avatar_widget.dart';
+import '../../../shared/widgets/mascot_widgets.dart';
+import '../../../shared/widgets/doodle_widget.dart';
 import '../providers/profile_provider.dart';
 
 class ProfileHeader extends ConsumerWidget {
   final ProfileStatsModel stats;
-  final bool           isOwn;
-  final VoidCallback   onLogout;
-  final VoidCallback   onEditProfile;
-  final VoidCallback?  onFollowTap;
+  final bool isOwn;
+  final VoidCallback onLogout;
+  final VoidCallback onEditProfile;
+  final VoidCallback? onFollowTap;
 
   const ProfileHeader({
     super.key,
@@ -25,26 +27,42 @@ class ProfileHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Read follow state from local provider — instant, no DB wait
-    final followState  = ref.watch(followProvider);
-    final isFollowing  = isOwn ? false : followState.isFollowing;
+    final followState = ref.watch(followProvider);
+    final isFollowing = isOwn ? false : followState.isFollowing;
 
     // Apply local delta to follower count so it updates instantly
-    final displayedFollowers =
-        stats.followerCount + (isOwn ? 0 : followState.followerDelta);
+    final displayedFollowers = stats.followerCount + (isOwn ? 0 : followState.followerDelta);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ── Banner ───────────────────────────────────────
-        Container(
-          height: 100,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF6D28D9), Color(0xFFDB2777)],
-              begin: Alignment.centerLeft,
-              end:   Alignment.centerRight,
+        Stack(
+          children: [
+            Container(
+              height: 140,
+              color: AppColors.inkWarm,
             ),
-          ),
+            // Floating Doodle in corner of banner
+            const Positioned(
+              top: 16,
+              right: 16,
+              child: DoodleWidget(
+                type: DoodleType.sparkle,
+                size: 32,
+                opacity: 0.25,
+              ),
+            ),
+            const Positioned(
+              top: 40,
+              left: 20,
+              child: DoodleWidget(
+                type: DoodleType.star,
+                size: 20,
+                opacity: 0.15,
+              ),
+            ),
+          ],
         ),
 
         Padding(
@@ -60,16 +78,56 @@ class ProfileHeader extends ConsumerWidget {
                   Transform.translate(
                     offset: const Offset(0, -28),
                     child: Container(
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.backgroundDark,
-                          width: 3,
-                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      child: AvatarWidget(
-                          imageUrl: stats.user.avatarUrl,
-                          size: 72),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border(
+                                top: BorderSide(color: AppColors.inkBase, width: 3.5),
+                                bottom: BorderSide(color: AppColors.inkBase, width: 3.5),
+                                left: BorderSide(color: AppColors.inkBase, width: 3.5),
+                                right: BorderSide(color: AppColors.inkBase, width: 3.5),
+                              ),
+                            ),
+                            child: AvatarWidget(imageUrl: stats.user.avatarUrl, size: 72),
+                          ),
+                          // Mascot badge stacked on avatar
+                          Positioned(
+                            bottom: -2,
+                            right: -2,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: const BoxDecoration(
+                                color: AppColors.inkBase,
+                                shape: BoxShape.circle,
+                              ),
+                              child: isOwn
+                                  ? const GhostMascot(
+                                      expression: GhostExpression.waving,
+                                      size: 24,
+                                      animate: true,
+                                      )
+                                  : const FrogMascot(
+                                      expression: FrogExpression.happy,
+                                      size: 24,
+                                      animate: true,
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   const Spacer(),
@@ -77,12 +135,12 @@ class ProfileHeader extends ConsumerWidget {
                   if (isOwn) ...[
                     _OutlineButton(
                       label: 'Edit profile',
-                      onTap:  onEditProfile,
+                      onTap: onEditProfile,
                     ),
                     const SizedBox(width: 8),
                     _OutlineButton(
                       label: 'Log out',
-                      onTap:  onLogout,
+                      onTap: onLogout,
                       isDestructive: true,
                     ),
                   ] else
@@ -96,33 +154,46 @@ class ProfileHeader extends ConsumerWidget {
               const SizedBox(height: 4),
 
               // ── Name + username ────────────────────────
-              Text(stats.user.fullName,
-                  style: AppTextStyles.sectionTitle
-                      .copyWith(color: AppColors.onSurfaceDark)),
-              Text('@${stats.user.username}',
-                  style: AppTextStyles.username),
+              Text(
+                stats.user.fullName,
+                style: AppTextStyles.sectionTitle.copyWith(
+                  color: AppColors.textPrimary,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              Text(
+                '@${stats.user.username}',
+                style: AppTextStyles.username.copyWith(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
 
               if (stats.user.bio?.isNotEmpty == true) ...[
-                const SizedBox(height: 8),
-                Text(stats.user.bio!,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                        color:
-                            AppColors.onSurfaceVariantDark)),
+                const SizedBox(height: 12),
+                Text(
+                  stats.user.bio!,
+                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                ),
               ],
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-              // ── Stats row ──────────────────────────────
+              // ── Stats row (Paper Card) ────────────────
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(16),
+                  color: AppColors.paperSage,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: AppColors.borderSubtle,
+                    width: 0.5,
+                  ),
+                  boxShadow: AppColors.shadowCard,
                 ),
                 child: Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     _Stat(
                       label: 'Posts',
@@ -130,7 +201,6 @@ class ProfileHeader extends ConsumerWidget {
                     ),
                     _Stat(
                       label: 'Followers',
-                      // Use local delta for instant update
                       value: displayedFollowers.clamp(0, 999999999),
                     ),
                     _Stat(
@@ -149,8 +219,8 @@ class ProfileHeader extends ConsumerWidget {
 }
 
 // ── Follow button — animated, reads local state ───────────────
-class _FollowButton extends StatelessWidget {
-  final bool         isFollowing;
+class _FollowButton extends ConsumerStatefulWidget {
+  final bool isFollowing;
   final VoidCallback? onTap;
 
   const _FollowButton({
@@ -159,38 +229,45 @@ class _FollowButton extends StatelessWidget {
   });
 
   @override
+  ConsumerState<_FollowButton> createState() => _FollowButtonState();
+}
+
+class _FollowButtonState extends ConsumerState<_FollowButton> {
+  bool _isTapped = false;
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        padding: const EdgeInsets.symmetric(
-            horizontal: 24, vertical: 10),
-        decoration: BoxDecoration(
-          gradient: isFollowing ? null : const LinearGradient(
-            colors: [Color(0xFF6D28D9), Color(0xFFDB2777)],
-            begin: Alignment.centerLeft,
-            end:   Alignment.centerRight,
+      onTapDown: (_) => setState(() => _isTapped = true),
+      onTapUp: (_) => setState(() => _isTapped = false),
+      onTapCancel: () => setState(() => _isTapped = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        scale: _isTapped ? 0.95 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+          decoration: BoxDecoration(
+            color: widget.isFollowing ? AppColors.inkWarm : AppColors.cream100,
+            border: Border.all(
+              color: widget.isFollowing ? AppColors.borderSubtle : Colors.transparent,
+              width: 0.5,
+            ),
+            borderRadius: BorderRadius.circular(100),
+            boxShadow: widget.isFollowing ? null : AppColors.shadowCard,
           ),
-          border: isFollowing
-              ? Border.all(
-                  color: AppColors.outlineVariant,
-                  width: 1.5)
-              : null,
-          borderRadius: BorderRadius.circular(100),
-        ),
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 150),
-          child: Text(
-            isFollowing ? 'Following' : 'Follow',
-            key: ValueKey(isFollowing),
-            style: TextStyle(
-              color: isFollowing
-                  ? AppColors.onSurfaceDark
-                  : Colors.white,
-              fontWeight: FontWeight.w700,
-              fontSize: 14,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 150),
+            child: Text(
+              widget.isFollowing ? 'Following' : 'Follow',
+              key: ValueKey(widget.isFollowing),
+              style: TextStyle(
+                color: widget.isFollowing ? AppColors.textPrimary : AppColors.textOnCream,
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+              ),
             ),
           ),
         ),
@@ -199,10 +276,10 @@ class _FollowButton extends StatelessWidget {
   }
 }
 
-class _OutlineButton extends StatelessWidget {
-  final String       label;
+class _OutlineButton extends StatefulWidget {
+  final String label;
   final VoidCallback onTap;
-  final bool         isDestructive;
+  final bool isDestructive;
 
   const _OutlineButton({
     required this.label,
@@ -211,29 +288,39 @@ class _OutlineButton extends StatelessWidget {
   });
 
   @override
+  State<_OutlineButton> createState() => _OutlineButtonState();
+}
+
+class _OutlineButtonState extends State<_OutlineButton> {
+  bool _isTapped = false;
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: isDestructive
-                ? AppColors.error.withOpacity(0.5)
-                : AppColors.outlineVariant,
-            width: 1.5,
+      onTapDown: (_) => setState(() => _isTapped = true),
+      onTapUp: (_) => setState(() => _isTapped = false),
+      onTapCancel: () => setState(() => _isTapped = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        scale: _isTapped ? 0.94 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: widget.isDestructive ? AppColors.dislike.withOpacity(0.08) : AppColors.inkWarm,
+            border: Border.all(
+              color: widget.isDestructive ? AppColors.dislike.withOpacity(0.4) : AppColors.borderSubtle,
+              width: 0.5,
+            ),
+            borderRadius: BorderRadius.circular(100),
           ),
-          borderRadius: BorderRadius.circular(100),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isDestructive
-                ? AppColors.error
-                : AppColors.onSurfaceDark,
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
+          child: Text(
+            widget.label,
+            style: TextStyle(
+              color: widget.isDestructive ? AppColors.dislike : AppColors.textPrimary,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ),
@@ -243,22 +330,30 @@ class _OutlineButton extends StatelessWidget {
 
 class _Stat extends StatelessWidget {
   final String label;
-  final int    value;
+  final int value;
   const _Stat({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
-    final display = value >= 1000
-        ? '${(value / 1000).toStringAsFixed(1)}k'
-        : '$value';
-    return Column(children: [
-      Text(display,
-          style: AppTextStyles.statNumber
-              .copyWith(color: AppColors.onSurfaceDark)),
-      const SizedBox(height: 4),
-      Text(label.toUpperCase(),
+    final display = value >= 1000 ? '${(value / 1000).toStringAsFixed(1)}k' : '$value';
+    return Column(
+      children: [
+        Text(
+          display,
+          style: AppTextStyles.statNumber.copyWith(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label.toUpperCase(),
           style: AppTextStyles.statLabel.copyWith(
-              color: AppColors.onSurfaceVariantDark)),
-    ]);
+            color: AppColors.textTertiary,
+            letterSpacing: 1.0,
+          ),
+        ),
+      ],
+    );
   }
 }
