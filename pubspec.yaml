@@ -1,5 +1,5 @@
 name: entangl_app
-description: Entangl - A modern social media platform
+description: Connect - A modern social media platform
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -10,37 +10,27 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # Supabase
   supabase_flutter: ^2.5.6
-
-  # State Management
   flutter_riverpod: ^2.5.1
   riverpod_annotation: ^2.3.5
-
-  # Navigation
   go_router: ^14.2.7
-
-  # Image handling
   image_picker: ^1.1.2
   video_player: ^2.9.2
   cached_network_image: ^3.3.1
-
-  # Storage & Prefs
   shared_preferences: ^2.3.2
   flutter_secure_storage: ^9.2.2
-
-  # UI Utilities
   timeago: ^3.6.1
   intl: ^0.19.0
   shimmer: ^3.0.0
-
-  # Icons
   cupertino_icons: ^1.0.8
+  flutter_svg: ^2.0.10
+  flutter_animate: ^4.5.0
+  google_fonts: ^6.2.1
 
 dev_dependencies:
-  flutter_launcher_icons: ^0.14.3
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.4
   flutter_lints: ^4.0.0
   build_runner: ^2.4.12
   riverpod_generator: ^2.4.3
@@ -48,15 +38,15 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/icon.png
     - assets/images/
     - assets/icons/
+    - assets/mascots/
+    - assets/icons/doodles/
 
 flutter_launcher_icons:
   android: true
-  ios: false
+  ios: true
+  image_path: "assets/images/icon.png"
 
-  image_path: "assets/icon.png"
-
-  adaptive_icon_foreground: "assets/icon.png"
+  adaptive_icon_foreground: "assets/images/icon.png"
   adaptive_icon_background: "#ffffff"
