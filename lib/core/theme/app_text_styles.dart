@@ -1,139 +1,148 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
-// Inter-based text styles matching the Stitch design
 class AppTextStyles {
   AppTextStyles._();
 
-  // ── Display / Hero headings ───────────────────────────────
-  static const TextStyle heroTitle = TextStyle(
-    fontFamily: 'Inter',
+  // ── Display Headings (Inter 800 with tight letter spacing) ──
+  static final TextStyle displayXl = GoogleFonts.inter(
     fontSize: 48,
     fontWeight: FontWeight.w800,
-    letterSpacing: -1.5,
-    height: 1.05,
+    height: 52 / 48,
+    letterSpacing: -1.92,
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle pageTitle = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 36,
-    fontWeight: FontWeight.w800,
-    letterSpacing: -1.0,
-    height: 1.1,
+  static final TextStyle displayLg = GoogleFonts.inter(
+    fontSize: 40,
+    fontWeight: FontWeight.w700,
+    height: 44 / 40,
+    letterSpacing: -1.20,
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle sectionTitle = TextStyle(
-    fontFamily: 'Inter',
+  static final TextStyle displayMd = GoogleFonts.inter(
+    fontSize: 24,
+    fontWeight: FontWeight.w700,
+    height: 30 / 24,
+    letterSpacing: -0.48,
+    color: AppColors.textPrimary,
+  );
+
+  static final TextStyle title1 = GoogleFonts.inter(
     fontSize: 28,
-    fontWeight: FontWeight.w700,
-    letterSpacing: -0.5,
+    fontWeight: FontWeight.w600,
+    height: 34 / 28,
+    letterSpacing: -0.56,
+    color: AppColors.textPrimary,
   );
 
-  // ── Brand wordmark ────────────────────────────────────────
-  static const TextStyle brandName = TextStyle(
-    fontFamily: 'Inter',
+  static final TextStyle title2 = GoogleFonts.inter(
     fontSize: 22,
-    fontWeight: FontWeight.w700,
-    letterSpacing: -0.8,
+    fontWeight: FontWeight.w600,
+    height: 28 / 22,
+    letterSpacing: -0.44,
+    color: AppColors.textPrimary,
   );
 
-  // ── Body text ─────────────────────────────────────────────
-  static const TextStyle bodyLarge = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 17,
+  static final TextStyle subtitle = GoogleFonts.inter(
+    fontSize: 18,
+    fontWeight: FontWeight.w500,
+    height: 24 / 18,
+    letterSpacing: 0,
+    color: AppColors.textPrimary,
+  );
+
+  // ── Body text ──
+  static final TextStyle bodyLarge = GoogleFonts.inter(
+    fontSize: 16,
     fontWeight: FontWeight.w400,
     height: 1.5,
+    letterSpacing: 0.16,
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle bodyMedium = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 15,
+  static final TextStyle bodyMedium = GoogleFonts.inter(
+    fontSize: 14,
     fontWeight: FontWeight.w400,
-    height: 1.5,
+    height: 1.43,
+    letterSpacing: 0.14,
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle bodySmall = TextStyle(
-    fontFamily: 'Inter',
+  static final TextStyle bodySmall = GoogleFonts.inter(
     fontSize: 13,
     fontWeight: FontWeight.w400,
     height: 1.4,
+    letterSpacing: 0.13,
+    color: AppColors.textSecondary,
   );
 
-  // ── Labels ────────────────────────────────────────────────
-  static const TextStyle labelLarge = TextStyle(
-    fontFamily: 'Inter',
+  // ── Labels ──
+  static final TextStyle labelLarge = GoogleFonts.inter(
     fontSize: 14,
     fontWeight: FontWeight.w600,
     letterSpacing: 0.1,
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle labelMedium = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 12,
+  static final TextStyle labelMedium = GoogleFonts.inter(
+    fontSize: 13,
     fontWeight: FontWeight.w500,
-    letterSpacing: 0.5,
+    height: 1.38,
+    letterSpacing: 0.26,
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle labelSmall = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 10,
-    fontWeight: FontWeight.w500,
-    letterSpacing: 0.8,
-  );
-
-  // ── Section labels (uppercase) ────────────────────────────
-  static TextStyle sectionLabel({Color? color}) => TextStyle(
-    fontFamily: 'Inter',
+  static final TextStyle labelSmall = GoogleFonts.inter(
     fontSize: 11,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 1.2,
-    color: color ?? AppColors.onSurfaceVariantDark,
+    fontWeight: FontWeight.w500,
+    height: 1.45,
+    letterSpacing: 0.44,
+    color: AppColors.textSecondary,
   );
 
-  // ── Username / handle ─────────────────────────────────────
-  static const TextStyle username = TextStyle(
-    fontFamily: 'Inter',
+  // ── Timestamp / caption ──
+  static final TextStyle timestamp = GoogleFonts.inter(
+    fontSize: 13,
+    fontWeight: FontWeight.w400,
+    height: 1.38,
+    letterSpacing: 0.13,
+    color: AppColors.textSecondary,
+  );
+
+  // ── Doodle Accent Style (Comic Neue for mascot descriptions) ──
+  static final TextStyle doodleAccent = GoogleFonts.comicNeue(
+    fontSize: 14,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textSecondary,
+  );
+
+  // ── Legacy mappings for compatibility ──
+  static final TextStyle heroTitle = displayXl;
+  static final TextStyle pageTitle = displayLg;
+  static final TextStyle sectionTitle = title1;
+  static final TextStyle brandName = title2;
+  static final TextStyle username = GoogleFonts.inter(
     fontSize: 14,
     fontWeight: FontWeight.w500,
     color: AppColors.primary,
   );
-
-  // ── Stat numbers (profile) ────────────────────────────────
-  static const TextStyle statNumber = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 26,
-    fontWeight: FontWeight.w800,
-    letterSpacing: -0.5,
-    height: 1.0,
-  );
-
-  static const TextStyle statLabel = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 10,
-    fontWeight: FontWeight.w500,
-    letterSpacing: 1.5,
-  );
-
-  // ── Button text ───────────────────────────────────────────
-  static const TextStyle buttonLarge = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 17,
-    fontWeight: FontWeight.w700,
-    letterSpacing: -0.3,
-  );
-
-  static const TextStyle buttonMedium = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 14,
+  static final TextStyle statNumber = GoogleFonts.inter(
+    fontSize: 28,
     fontWeight: FontWeight.w600,
-    letterSpacing: 0.2,
+    height: 1.0,
+    color: AppColors.textPrimary,
   );
+  static final TextStyle statLabel = labelSmall;
+  static final TextStyle buttonLarge = labelMedium.copyWith(fontSize: 13);
+  static final TextStyle buttonMedium = labelMedium.copyWith(fontSize: 13);
 
-  // ── Timestamp / caption ───────────────────────────────────
-  static const TextStyle timestamp = TextStyle(
-    fontFamily: 'Inter',
-    fontSize: 12,
-    fontWeight: FontWeight.w400,
-    color: AppColors.onSurfaceVariantDark,
+  static TextStyle sectionLabel({Color? color}) => GoogleFonts.inter(
+    fontSize: 11,
+    fontWeight: FontWeight.w600,
+    letterSpacing: 1.2,
+    color: color ?? AppColors.textSecondary,
   );
 }
