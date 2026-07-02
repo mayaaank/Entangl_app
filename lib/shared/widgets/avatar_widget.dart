@@ -21,9 +21,9 @@ class AvatarWidget extends StatelessWidget {
     Widget avatar = Container(
       width:  size,
       height: size,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.surfaceContainerHigh,
+        color: AppColors.inkWarm,
       ),
       child: ClipOval(
         child: imageUrl != null && imageUrl!.isNotEmpty
@@ -33,23 +33,23 @@ class AvatarWidget extends StatelessWidget {
                 height: size,
                 fit: BoxFit.cover,
                 placeholder: (_, __) => Container(
-                  color: AppColors.surfaceContainerHigh,
+                  color: AppColors.inkWarm,
                   child: Icon(
                     Icons.person_rounded,
                     size: size * 0.45,
-                    color: AppColors.outlineVariant,
+                    color: AppColors.textMuted,
                   ),
                 ),
                 errorWidget: (_, __, ___) => Icon(
                   Icons.person_rounded,
                   size: size * 0.45,
-                  color: AppColors.outlineVariant,
+                  color: AppColors.textMuted,
                 ),
               )
             : Icon(
                 Icons.person_rounded,
                 size: size * 0.45,
-                color: AppColors.outlineVariant,
+                color: AppColors.textMuted,
               ),
       ),
     );
@@ -58,13 +58,13 @@ class AvatarWidget extends StatelessWidget {
       avatar = Container(
         padding: const EdgeInsets.all(2.5),
         decoration: const BoxDecoration(
-          gradient: AppColors.avatarRingGradient,
+          color: AppColors.cream100,
           shape: BoxShape.circle,
         ),
         child: Container(
           padding: const EdgeInsets.all(2),
           decoration: const BoxDecoration(
-            color: AppColors.backgroundDark,
+            color: AppColors.inkBase,
             shape: BoxShape.circle,
           ),
           child: avatar,

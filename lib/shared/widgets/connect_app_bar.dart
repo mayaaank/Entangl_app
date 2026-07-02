@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:ui';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import 'gradient_text.dart';
 
-class EntanglAppBar extends StatelessWidget implements PreferredSizeWidget {
+class ConnectAppBar extends ConsumerWidget implements PreferredSizeWidget {
   final VoidCallback? onSettingsTap;
   final Widget? trailing;
   final Widget? leading;
   final String? title;
 
-  const EntanglAppBar({
+  const ConnectAppBar({
     super.key,
     this.onSettingsTap,
     this.trailing,
@@ -22,39 +23,41 @@ class EntanglAppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(60);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           height: preferredSize.height + MediaQuery.of(context).padding.top,
           decoration: BoxDecoration(
-            color: AppColors.backgroundDark.withOpacity(0.85),
-            border: Border(
+            color: AppColors.inkMid.withOpacity(0.85),
+            border: const Border(
               bottom: BorderSide(
-                color: AppColors.outlineVariant.withOpacity(0.08),
+                color: AppColors.borderSubtle,
                 width: 1,
               ),
             ),
           ),
           padding: EdgeInsets.only(
             top: MediaQuery.of(context).padding.top,
-            left: 20,
+            left: 16,
             right: 8,
           ),
           child: Row(
             children: [
               if (leading != null) leading!,
+              const SizedBox(width: 8),
               if (title != null)
-                Text(title!,
-                    style: AppTextStyles.sectionTitle.copyWith(
-                      color: AppColors.onSurfaceDark,
-                      fontSize: 22,
-                    ))
+                Text(
+                  title!,
+                  style: AppTextStyles.title2.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
+                )
               else
                 GradientText(
-                  'Entangl',
-                  style: AppTextStyles.brandName.copyWith(fontSize: 24),
+                  'Connect',
+                  style: AppTextStyles.brandName,
                 ),
               const Spacer(),
               if (trailing != null)
@@ -63,7 +66,7 @@ class EntanglAppBar extends StatelessWidget implements PreferredSizeWidget {
                 IconButton(
                   onPressed: onSettingsTap,
                   icon: const Icon(Icons.settings_outlined,
-                      color: AppColors.primary, size: 22),
+                      color: AppColors.cream100, size: 22),
                 ),
             ],
           ),

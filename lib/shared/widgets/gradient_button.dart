@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 
-// The full-width pill gradient CTA button used throughout the app
-class GradientButton extends StatelessWidget {
+class GradientButton extends StatefulWidget {
   final String label;
   final VoidCallback? onTap;
   final bool isLoading;
@@ -16,66 +16,131 @@ class GradientButton extends StatelessWidget {
     required this.label,
     required this.onTap,
     this.isLoading = false,
-    this.height = 60,
+    this.height = 52,
     this.leadingIcon,
     this.trailingIcon,
   });
 
   @override
+  State<GradientButton> createState() => _GradientButtonState();
+}
+
+class _GradientButtonState extends State<GradientButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+      lowerBound: 0.96,
+      upperBound: 1.0,
+      value: 1.0,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleTapDown(TapDownDetails details) {
+    if (widget.onTap != null && !widget.isLoading) {
+      setState(() {
+        _isPressed = true;
+      });
+      _controller.animateTo(0.96, curve: Curves.easeOutQuad);
+    }
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    if (widget.onTap != null && !widget.isLoading) {
+      setState(() {
+        _isPressed = false;
+      });
+      _controller.animateTo(1.0, curve: Curves.elasticOut);
+      HapticFeedback.lightImpact();
+      widget.onTap!();
+    }
+  }
+
+  void _handleTapCancel() {
+    if (widget.onTap != null && !widget.isLoading) {
+      setState(() {
+        _isPressed = false;
+      });
+      _controller.animateTo(1.0, curve: Curves.easeOutQuad);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: isLoading ? null : onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        height: height,
-        decoration: BoxDecoration(
-          gradient: onTap == null || isLoading
-              ? null
-              : AppColors.primaryGradient,
-          color: onTap == null || isLoading
-              ? AppColors.surfaceContainerHigh
-              : null,
-          borderRadius: BorderRadius.circular(100),
-          boxShadow: onTap != null && !isLoading
-              ? [
-                  BoxShadow(
-                    color: AppColors.violetGlowStrong,
-                    blurRadius: 40,
-                    offset: const Offset(0, 20),
-                  )
-                ]
-              : null,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (leadingIcon != null) ...[
-              leadingIcon!,
-              const SizedBox(width: 8),
-            ],
-            if (isLoading)
-              const SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: Colors.white,
+    final isDisabled = widget.onTap == null || widget.isLoading;
+
+    Color containerColor;
+    List<BoxShadow>? shadows;
+    Color textColor;
+
+    if (isDisabled) {
+      containerColor = AppColors.inkWarm;
+      textColor = AppColors.textMuted;
+      shadows = null;
+    } else if (_isPressed) {
+      containerColor = AppColors.cream80;
+      textColor = AppColors.textOnCream;
+      shadows = AppColors.haloPress;
+    } else {
+      containerColor = AppColors.cream100;
+      textColor = AppColors.textOnCream;
+      shadows = AppColors.shadowCard;
+    }
+
+    return ScaleTransition(
+      scale: _controller,
+      child: GestureDetector(
+        onTapDown: _handleTapDown,
+        onTapUp: _handleTapUp,
+        onTapCancel: _handleTapCancel,
+        child: Container(
+          height: widget.height,
+          decoration: BoxDecoration(
+            color: containerColor,
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: shadows,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (widget.leadingIcon != null && !widget.isLoading) ...[
+                widget.leadingIcon!,
+                const SizedBox(width: 8),
+              ],
+              if (widget.isLoading)
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: textColor,
+                  ),
+                )
+              else
+                Text(
+                  widget.label,
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: textColor,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              )
-            else
-              Text(
-                label,
-                style: AppTextStyles.buttonLarge.copyWith(
-                  color: onTap != null
-                      ? Colors.white
-                      : AppColors.onSurfaceVariantDark,
-                ),
-              ),
-            if (trailingIcon != null && !isLoading) ...[
-              const SizedBox(width: 8),
-              trailingIcon!,
+              if (widget.trailingIcon != null && !widget.isLoading) ...[
+                const SizedBox(width: 8),
+                widget.trailingIcon!,
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
