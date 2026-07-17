@@ -136,6 +136,24 @@ class UsersRepository {
         .toList();
   }
 
+  /// Suggested people for empty-graph / discovery (approved users, exclude self).
+  Future<List<UserModel>> getSuggestedUsers({int limit = 12}) async {
+    final uid = SupabaseService.currentUserId;
+    var query = _db
+        .from('profiles')
+        .select('id, username, full_name, avatar_url, bio, status, created_at')
+        .eq('status', 'approved')
+        .order('created_at', ascending: false)
+        .limit(limit + 4);
+    final rows = await query;
+    final list = (rows as List)
+        .map((r) => UserModel.fromJson(r as Map<String, dynamic>))
+        .where((u) => u.id != uid)
+        .take(limit)
+        .toList();
+    return list;
+  }
+
   List<UserModel> _extractProfiles(List rows) {
     return rows.map((item) {
       final p = item['profiles'];

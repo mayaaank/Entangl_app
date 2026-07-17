@@ -7,6 +7,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../data/models/post_model.dart';
 import '../../../data/services/supabase_service.dart';
 import '../../../shared/widgets/entangl_nav_bar.dart';
+import '../../../shared/widgets/feed_skeleton.dart';
 import '../../../shared/widgets/post_card.dart';
 import '../../../shared/widgets/mascot_widgets.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -101,9 +102,9 @@ class _ProfileScaffoldState extends ConsumerState<_ProfileScaffold>
               ),
             ),
       body: statsAsync.when(
-        loading: () => const Center(
-            child: CircularProgressIndicator(
-                color: AppColors.cream100, strokeWidth: 2)),
+        loading: () => const SingleChildScrollView(
+          child: ProfileSkeleton(),
+        ),
         error: (e, _) => Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,

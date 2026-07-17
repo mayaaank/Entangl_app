@@ -123,8 +123,9 @@ class _ApprovalStatusBodyState extends ConsumerState<_ApprovalStatusBody> {
               ),
               const SizedBox(height: 8),
               Text(
-                'The platform owner needs to approve your account '
-                'before you can start using Entangl. Please check back later.',
+                'Entangl is invite-reviewed. A platform owner will approve '
+                'your account before you can post and explore. This usually '
+                'takes a little while — you can close the app and check back later.',
                 textAlign: TextAlign.center,
                 style: AppTextStyles.bodySmall
                     .copyWith(color: AppColors.outlineVariant),
@@ -144,13 +145,22 @@ class _ApprovalStatusBodyState extends ConsumerState<_ApprovalStatusBody> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Your request is being reviewed.',
+                      'Status: pending review. Tap “Check Again” after you are approved.',
                       style: AppTextStyles.bodySmall.copyWith(
                           color: const Color(0xFFF59E0B),
                           fontWeight: FontWeight.w600),
                     ),
                   ),
                 ]),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Need help? Contact the person who invited you, or email the '
+                'platform admin if you have their address.',
+                textAlign: TextAlign.center,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textTertiary,
+                ),
               ),
             ],
 
@@ -163,9 +173,8 @@ class _ApprovalStatusBodyState extends ConsumerState<_ApprovalStatusBody> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Unfortunately, the platform owner has not approved your '
-                'account at this time. If you believe this is a mistake, '
-                'please contact the administrator.',
+                'The platform owner did not approve this account. If you think '
+                'this is a mistake, reach out to them with the email you used to sign up.',
                 textAlign: TextAlign.center,
                 style: AppTextStyles.bodySmall
                     .copyWith(color: AppColors.outlineVariant),
@@ -185,7 +194,7 @@ class _ApprovalStatusBodyState extends ConsumerState<_ApprovalStatusBody> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Your registration was not approved.',
+                      'Status: not approved. You can log out or check again if the decision was reversed.',
                       style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.error,
                           fontWeight: FontWeight.w600),

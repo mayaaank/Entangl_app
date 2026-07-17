@@ -10,8 +10,10 @@ import '../../features/auth/screens/splash_screen.dart';
 import '../../features/feed/screens/home_screen.dart';
 import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/post/screens/create_post_screen.dart';
+import '../../features/profile/screens/account_security_screen.dart';
 import '../../features/profile/screens/edit_profile_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
+import '../../features/search/screens/search_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
 
 class AppRoutes {
@@ -23,9 +25,11 @@ class AppRoutes {
   static const home           = '/home';
   static const createPost     = '/create-post';
   static const notifications  = '/notifications';
+  static const search         = '/search';
   static const profile        = '/profile';
   static const otherProfile   = '/profile/:userId';
   static const editProfile    = '/profile/edit';
+  static const accountSecurity = '/profile/security';
   static const settings       = '/settings';
   static const adminRequests  = '/admin/requests';
 }
@@ -55,8 +59,10 @@ final routerProvider = Provider<GoRouter>((_) {
       GoRoute(path: AppRoutes.home,           builder: (_, __) => const HomeScreen()),
       GoRoute(path: AppRoutes.createPost,     builder: (_, __) => const CreatePostScreen()),
       GoRoute(path: AppRoutes.notifications,  builder: (_, __) => const NotificationsScreen()),
+      GoRoute(path: AppRoutes.search,         builder: (_, __) => const SearchScreen()),
       GoRoute(path: AppRoutes.profile,        builder: (_, __) => const ProfileScreen()),
       GoRoute(path: AppRoutes.editProfile,    builder: (_, __) => const EditProfileScreen()),
+      GoRoute(path: AppRoutes.accountSecurity, builder: (_, __) => const AccountSecurityScreen()),
       GoRoute(
         path: '/profile/:userId',
         builder: (_, state) => OtherProfileScreen(

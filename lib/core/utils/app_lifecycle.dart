@@ -15,15 +15,14 @@ class AppLifecycleWrapper extends StatefulWidget {
 
 class _AppLifecycleWrapperState extends State<AppLifecycleWrapper>
     with WidgetsBindingObserver {
-  bool   _isOnline  = true;  // assume online until proven otherwise
-  bool   _checked   = false; // don't show banner before first check
+  bool   _isOnline  = true;
+  bool   _checked   = false;
   Timer? _pollTimer;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // Delay first check so app starts up without false banner
     Future.delayed(const Duration(seconds: 3), () {
       _checkConnectivity();
       _pollTimer = Timer.periodic(
@@ -49,7 +48,6 @@ class _AppLifecycleWrapperState extends State<AppLifecycleWrapper>
   }
 
   Future<void> _checkConnectivity() async {
-    // Try multiple hosts — if any responds, we're online
     final hosts = ['8.8.8.8', '1.1.1.1', '208.67.222.222'];
     bool online = false;
 
@@ -92,22 +90,36 @@ class _AppLifecycleWrapperState extends State<AppLifecycleWrapper>
 
   @override
   Widget build(BuildContext context) {
-    // Don't show banner until we've done at least one check
     final showBanner = _checked && !_isOnline;
+    // Reserve space so floating bottom nav is not covered by the banner.
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+    final bannerReserve = showBanner ? 36.0 + bottomInset + 8 : 0.0;
 
-    return Column(
+    return Stack(
       children: [
-        Expanded(child: widget.child),
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.easeInOut,
-          height: showBanner ? 36 : 0,
-          child: showBanner
-              ? Container(
-                  color: AppColors.errorContainer,
-                  child: const Row(
+        Positioned.fill(
+          child: Padding(
+            padding: EdgeInsets.only(bottom: bannerReserve > 0 ? 36 : 0),
+            child: widget.child,
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: AnimatedSlide(
+            duration: const Duration(milliseconds: 320),
+            curve: Curves.easeInOut,
+            offset: showBanner ? Offset.zero : const Offset(0, 1),
+            child: Material(
+              color: AppColors.dislike,
+              child: SafeArea(
+                top: false,
+                child: SizedBox(
+                  height: 36,
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                    children: const [
                       Icon(Icons.wifi_off_rounded,
                           color: Colors.white, size: 14),
                       SizedBox(width: 8),
@@ -121,8 +133,10 @@ class _AppLifecycleWrapperState extends State<AppLifecycleWrapper>
                       ),
                     ],
                   ),
-                )
-              : const SizedBox.shrink(),
+                ),
+              ),
+            ),
+          ),
         ),
       ],
     );

@@ -250,18 +250,27 @@ class _PostCardState extends ConsumerState<PostCard> {
                   bottomLeft: Radius.circular(24),
                   bottomRight: Radius.circular(24),
                 ),
-                child: CachedNetworkImage(
-                  imageUrl: post.imageUrl!,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  placeholder: (_, __) => Container(
-                    height: 220,
-                    color: AppColors.inkWarm,
-                    child: const Center(
-                      child: CircularProgressIndicator(color: AppColors.cream100, strokeWidth: 2),
+                child: AspectRatio(
+                  aspectRatio: 4 / 5,
+                  child: CachedNetworkImage(
+                    imageUrl: post.imageUrl!,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    fadeInDuration: const Duration(milliseconds: 280),
+                    fadeOutDuration: const Duration(milliseconds: 120),
+                    memCacheWidth: 900,
+                    placeholder: (_, __) => Container(
+                      color: AppColors.inkWarm,
+                    ),
+                    errorWidget: (_, __, ___) => Container(
+                      color: AppColors.inkWarm,
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.broken_image_outlined,
+                        color: AppColors.textTertiary,
+                      ),
                     ),
                   ),
-                  errorWidget: (_, __, ___) => const SizedBox.shrink(),
                 ),
               ),
             ),

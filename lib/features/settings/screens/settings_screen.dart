@@ -77,14 +77,26 @@ class SettingsScreen extends ConsumerWidget {
             // ── Account ───────────────────────────────────
             SettingsSection(label: 'Account', rows: [
               SettingsChevronRow(
-                  icon: Icons.lock_outline,
-                  label: 'Change Password',
+                  icon: Icons.person_outline_rounded,
+                  label: 'Edit profile',
                   onTap: () => context.push(AppRoutes.editProfile)),
+              const Divider(height: 1, indent: 56),
+              SettingsChevronRow(
+                  icon: Icons.lock_outline,
+                  label: 'Password & email',
+                  onTap: () => context.push(AppRoutes.accountSecurity)),
               const Divider(height: 1, indent: 56),
               SettingsChevronRow(
                   icon: Icons.privacy_tip_outlined,
                   label: 'Privacy Settings',
-                  onTap: () {}),
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Privacy controls are coming soon.'),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  }),
             ]),
             const SizedBox(height: 28),
 

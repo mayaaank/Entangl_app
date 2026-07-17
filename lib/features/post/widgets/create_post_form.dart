@@ -20,6 +20,23 @@ class CreatePostForm extends ConsumerStatefulWidget {
 
 class _CreatePostFormState extends ConsumerState<CreatePostForm> {
   final _ctrl = TextEditingController();
+  bool _draftHydrated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(createPostProvider.notifier).loadDraft();
+      if (!mounted) return;
+      final s = ref.read(createPostProvider);
+      if (s.content.isNotEmpty && _ctrl.text != s.content) {
+        _ctrl.text = s.content;
+        _ctrl.selection =
+            TextSelection.collapsed(offset: s.content.length);
+      }
+      setState(() => _draftHydrated = true);
+    });
+  }
 
   @override
   void dispose() {
@@ -92,6 +109,51 @@ class _CreatePostFormState extends ConsumerState<CreatePostForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (state.hasRestoredDraft && _draftHydrated) ...[
+              Container(
+                width: double.infinity,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.inkWarm,
+                  borderRadius: BorderRadius.circular(14),
+                  border:
+                      Border.all(color: AppColors.borderSubtle, width: 0.5),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.history_rounded,
+                        color: AppColors.cream100, size: 18),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Draft restored',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        await ref
+                            .read(createPostProvider.notifier)
+                            .discardDraft();
+                        _ctrl.clear();
+                      },
+                      child: Text(
+                        'Discard',
+                        style: AppTextStyles.labelSmall.copyWith(
+                          color: AppColors.dislike,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

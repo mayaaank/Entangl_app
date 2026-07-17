@@ -43,7 +43,9 @@ class CreatePostScreen extends ConsumerWidget {
         backgroundColor: AppColors.inkBase,
         elevation: 0,
         leading: IconButton(
+          tooltip: 'Close',
           onPressed: () {
+            // Keep draft in SharedPreferences; only reset in-memory notifier.
             ref.invalidate(createPostProvider);
             context.pop();
           },
