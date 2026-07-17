@@ -56,6 +56,50 @@ class PostsRepository {
     }
   }
 
+  /// Single post by id (notification deep links, etc.).
+  Future<PostModel?> getPostById(String postId) async {
+    try {
+      final uid = SupabaseService.currentUserId;
+      final row = await _db
+          .from('posts')
+          .select('''
+            id,
+            user_id,
+            content,
+            image_url,
+            created_at,
+            profiles (
+              id,
+              username,
+              full_name,
+              avatar_url
+            ),
+            likes (
+              id,
+              user_id
+            ),
+            dislikes (
+              id,
+              user_id
+            ),
+            comments (
+              id
+            )
+          ''')
+          .eq('id', postId)
+          .maybeSingle();
+      if (row == null) return null;
+      return PostModel.fromJson(
+        Map<String, dynamic>.from(row),
+        currentUserId: uid,
+      );
+    } catch (e, st) {
+      debugPrint('CONNECT ERROR getPostById: $e');
+      debugPrint('CONNECT STACK: $st');
+      rethrow;
+    }
+  }
+
   Future<List<PostModel>> getUserPosts(String userId, {int offset = 0}) async {
     try {
       final uid = SupabaseService.currentUserId;

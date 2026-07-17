@@ -6,11 +6,15 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/entangl_app_bar.dart';
 import '../../../shared/widgets/mascot_widgets.dart';
+import '../../../shared/widgets/gradient_button.dart';
 import '../providers/notifications_provider.dart';
+import '../utils/notification_navigation.dart';
 import '../widgets/notification_tile.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
+
+  static const _maxStaggerItems = 5;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -21,8 +25,10 @@ class NotificationsScreen extends ConsumerWidget {
       backgroundColor: AppColors.inkBase,
       appBar: EntanglAppBar(
         leading: IconButton(
+          tooltip: 'Back',
           onPressed: () => context.pop(),
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new,
+              color: AppColors.textPrimary, size: 20),
         ),
         title: 'Notifications',
         trailing: TextButton(
@@ -38,11 +44,57 @@ class NotificationsScreen extends ConsumerWidget {
         ),
       ),
       body: notifsAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.cream100),
+        loading: () => ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          itemCount: 6,
+          itemBuilder: (_, __) => Container(
+            height: 72,
+            margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+            decoration: BoxDecoration(
+              color: AppColors.inkWarm,
+              borderRadius: BorderRadius.circular(16),
+            ),
+          )
+              .animate(onPlay: (c) => c.repeat())
+              .shimmer(duration: 1400.ms, color: AppColors.inkMid),
         ),
         error: (e, _) => Center(
-          child: Text('$e', style: const TextStyle(color: AppColors.textPrimary)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const FrogMascot(
+                  expression: FrogExpression.sad,
+                  size: 88,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Could not load notifications',
+                  style: AppTextStyles.displayMd.copyWith(
+                    color: AppColors.textPrimary,
+                    fontSize: 20,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Check your connection and try again.',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textTertiary,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: 140,
+                  child: GradientButton(
+                    label: 'Retry',
+                    onTap: () => ref.invalidate(notificationsProvider),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
         data: (notifs) => notifs.isEmpty
             ? Center(
@@ -64,7 +116,7 @@ class NotificationsScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        "No new activity to show right now.",
+                        'No new activity to show right now.',
                         textAlign: TextAlign.center,
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: AppColors.textTertiary,
@@ -74,22 +126,36 @@ class NotificationsScreen extends ConsumerWidget {
                   ),
                 ),
               )
-            : ListView.builder(
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                itemCount: notifs.length,
-                itemBuilder: (_, i) => NotificationTile(
-                  notification: notifs[i],
-                  onTap: () {
-                    notifier.markRead(notifs[i].id);
-                    if (notifs[i].actorId.isNotEmpty) {
-                      context.push('/profile/${notifs[i].actorId}');
+            : RefreshIndicator(
+                color: AppColors.cream100,
+                backgroundColor: AppColors.inkMid,
+                onRefresh: notifier.refresh,
+                child: ListView.builder(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                  itemCount: notifs.length,
+                  itemBuilder: (_, i) {
+                    Widget tile = NotificationTile(
+                      notification: notifs[i],
+                      onTap: () =>
+                          openNotificationTarget(context, ref, notifs[i]),
+                      onDismiss: () => notifier.remove(notifs[i].id),
+                    );
+                    // Cap entrance motion so long lists do not feel laggy.
+                    if (i < _maxStaggerItems) {
+                      tile = tile
+                          .animate()
+                          .fadeIn(
+                              delay: (40 * i).ms, duration: 220.ms)
+                          .slideY(
+                              begin: 0.04,
+                              end: 0,
+                              duration: 200.ms,
+                              curve: Curves.easeOutQuad);
                     }
+                    return tile;
                   },
-                  onDismiss: () => notifier.remove(notifs[i].id),
-                )
-                    .animate()
-                    .fadeIn(delay: (60 * i).ms, duration: 350.ms)
-                    .slideY(begin: 0.08, end: 0, duration: 250.ms, curve: Curves.easeOutQuad),
+                ),
               ),
       ),
     );

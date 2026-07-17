@@ -12,16 +12,29 @@ class NotificationsNotifier
       ref.read(notificationsRepositoryProvider).getNotifications();
 
   Future<void> refresh() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() =>
-        ref.read(notificationsRepositoryProvider).getNotifications());
+    try {
+      final list =
+          await ref.read(notificationsRepositoryProvider).getNotifications();
+      state = AsyncData(list);
+      ref.invalidate(unreadCountProvider);
+    } catch (e, st) {
+      if (!state.hasValue) {
+        state = AsyncError(e, st);
+      }
+    }
   }
 
   Future<void> markRead(String id) async {
-    await ref.read(notificationsRepositoryProvider).markAsRead(id);
+    // Optimistic local update + badge refresh; network can lag behind.
     state = AsyncData((state.valueOrNull ?? [])
         .map((n) => n.id == id ? n.copyWith(isRead: true) : n)
         .toList());
+    ref.invalidate(unreadCountProvider);
+    try {
+      await ref.read(notificationsRepositoryProvider).markAsRead(id);
+    } catch (_) {
+      // Keep local read state; next refresh will reconcile.
+    }
   }
 
   Future<void> markAllRead() async {

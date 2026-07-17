@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../data/repositories/auth_repository.dart';
+import '../../../data/services/notification_service.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((_) => AuthRepository());
 
@@ -35,6 +36,10 @@ class AuthNotifier extends AsyncNotifier<void> {
 
   Future<void> signOut() async {
     state = const AsyncLoading();
+    // Drop FCM token while session is still valid (RLS needs auth.uid()).
+    try {
+      await NotificationService.instance.unregisterBeforeSignOut();
+    } catch (_) {}
     state = await AsyncValue.guard(
         () => ref.read(authRepositoryProvider).signOut());
   }
