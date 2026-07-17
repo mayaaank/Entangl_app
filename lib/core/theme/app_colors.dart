@@ -27,9 +27,10 @@ class AppColors {
   // ── Text ──────────────────────────────────────────────────────────
   static const Color textPrimary   = Color(0xFFF0E8D8); // Warm offwhite — all primary text
   static const Color textSecondary = Color(0xFFA89880); // Warm clay mid — secondary text
-  static const Color textTertiary  = Color(0xFF6B5F50); // Warm muted brown — timestamps
+  // Raised from #6B5F50 for AA-ish contrast on ink backgrounds (timestamps / hints).
+  static const Color textTertiary  = Color(0xFF9A8B78); // Warm clay mid-light — timestamps
   static const Color textOnCream   = Color(0xFF1A1610); // Near-black — text ON cream buttons
-  static const Color textMuted     = Color(0xFF4A4035); // Disabled / placeholder text
+  static const Color textMuted     = Color(0xFF6B5F50); // Disabled / placeholder (was tertiary)
 
   // ── Semantic Reaction Colors (Ink Pens) ───────────────────────────
   // Each is a different ink color in a doodle set. Muted, botanical, distinct.

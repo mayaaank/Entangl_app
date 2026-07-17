@@ -21,58 +21,56 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 2500), _navigate);
+    _boot();
   }
 
-  Future<void> _navigate() async {
-    if (!mounted) return;
+  /// Adaptive splash: short pause when a session already exists so launch
+  /// does not feel artificially slow; slightly longer brand beat for cold start.
+  Future<void> _boot() async {
+    final sw = Stopwatch()..start();
     final hasSession =
         Supabase.instance.client.auth.currentSession != null;
+    final minMs = hasSession ? 450 : 1400;
 
-    if (!hasSession) {
-      context.go(AppRoutes.login);
-      return;
+    final route = await _resolveRoute(hasSession);
+
+    final remaining = minMs - sw.elapsedMilliseconds;
+    if (remaining > 0) {
+      await Future.delayed(Duration(milliseconds: remaining));
     }
+    if (!mounted) return;
+    context.go(route);
+  }
 
-    // Check profile status for pending/rejected users
+  Future<String> _resolveRoute(bool hasSession) async {
+    if (!hasSession) return AppRoutes.login;
+
     try {
       final profile = await UsersRepository().getOwnProfile();
-      if (!mounted) return;
+      if (profile == null) return AppRoutes.login;
 
-      if (profile == null) {
-        context.go(AppRoutes.login);
-        return;
-      }
-
-      // Handle approved email change — auto-process it
       if (profile.status.startsWith('email_change_approved:')) {
         final newEmail =
             profile.status.replaceFirst('email_change_approved:', '');
         try {
           await AuthRepository().updateEmail(newEmail);
           await UsersRepository().processApprovedEmailChange(newEmail);
-        } catch (_) {
-          // Continue even if processing fails
-        }
+        } catch (_) {}
       }
 
-      if (profile.isApproved) {
-        context.go(AppRoutes.home);
-      } else {
-        context.go(AppRoutes.approvalStatus);
-      }
+      if (profile.isApproved) return AppRoutes.home;
+      return AppRoutes.approvalStatus;
     } catch (_) {
-      if (mounted) context.go(AppRoutes.home);
+      return AppRoutes.home;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.inkBase, // Warm ink background
+      backgroundColor: AppColors.inkBase,
       body: Stack(
         children: [
-          // Subtle ambient glow in the center
           Center(
             child: Container(
               width: 250,
@@ -94,7 +92,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Mascots floating side-by-side (representing the connection / high-five)
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -128,18 +125,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                // Subtitle "entangl" lowercase, whispered spacing
                 Text(
                   'entangl',
                   style: AppTextStyles.labelSmall.copyWith(
                     color: AppColors.textTertiary,
                     fontSize: 16,
-                    letterSpacing: 16 * 0.3, // 0.3em
+                    letterSpacing: 16 * 0.3,
                   ),
                 )
-                    .animate(delay: 800.ms)
-                    .fadeIn(duration: 600.ms)
-                    .moveY(begin: 10, end: 0, duration: 400.ms, curve: Curves.easeOut),
+                    .animate(delay: 400.ms)
+                    .fadeIn(duration: 500.ms)
+                    .moveY(
+                        begin: 10,
+                        end: 0,
+                        duration: 400.ms,
+                        curve: Curves.easeOut),
               ],
             ),
           ),

@@ -39,10 +39,21 @@ class _FeedListState extends ConsumerState<FeedList> {
   Widget build(BuildContext context) {
     final feedAsync = ref.watch(feedProvider);
 
+    final notifier = ref.read(feedProvider.notifier);
     return feedAsync.when(
-      loading: () => const Center(
-        child: CircularProgressIndicator(
-            color: AppColors.cream100, strokeWidth: 2),
+      skipLoadingOnReload: true,
+      skipLoadingOnRefresh: true,
+      loading: () => ListView.builder(
+        padding: const EdgeInsets.only(top: 8, bottom: 120),
+        itemCount: 4,
+        itemBuilder: (_, __) => Container(
+          height: 220,
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppColors.paperSage,
+            borderRadius: BorderRadius.circular(24),
+          ),
+        ),
       ),
       error: (e, _) => Center(
         child: Padding(
@@ -152,7 +163,9 @@ class _FeedListState extends ConsumerState<FeedList> {
                 itemCount: posts.length + 1,
                 itemBuilder: (_, i) {
                   if (i == posts.length) {
-                    // Bottom loader
+                    if (!notifier.hasMore) {
+                      return const SizedBox(height: 24);
+                    }
                     return const Padding(
                       padding: EdgeInsets.symmetric(vertical: 24),
                       child: Center(

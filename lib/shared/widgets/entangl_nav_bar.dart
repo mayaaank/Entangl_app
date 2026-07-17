@@ -8,11 +8,14 @@ import 'mascot_widgets.dart';
 class EntanglNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
+  /// Optional long-press on the center Create button (e.g. Post vs Story sheet).
+  final VoidCallback? onCreateLongPress;
 
   const EntanglNavBar({
     super.key,
     required this.currentIndex,
     required this.onTap,
+    this.onCreateLongPress,
   });
 
   @override
@@ -56,6 +59,7 @@ class EntanglNavBar extends StatelessWidget {
                   _NavItem(
                     icon: Icons.home_outlined,
                     activeIcon: Icons.home_rounded,
+                    label: 'Home',
                     isActive: currentIndex == 0,
                     onTap: () => onTap(0),
                     activeCharacter: const GhostMascot(
@@ -63,10 +67,14 @@ class EntanglNavBar extends StatelessWidget {
                       size: 20,
                     ),
                   ),
-                  _CreateButton(onTap: () => onTap(1)),
+                  _CreateButton(
+                    onTap: () => onTap(1),
+                    onLongPress: onCreateLongPress,
+                  ),
                   _NavItem(
                     icon: Icons.person_outline_rounded,
                     activeIcon: Icons.person_rounded,
+                    label: 'Profile',
                     isActive: currentIndex == 2,
                     onTap: () => onTap(2),
                     activeCharacter: const FrogMascot(
@@ -87,6 +95,7 @@ class EntanglNavBar extends StatelessWidget {
 class _NavItem extends StatelessWidget {
   final IconData icon;
   final IconData activeIcon;
+  final String label;
   final bool isActive;
   final VoidCallback onTap;
   final Widget activeCharacter;
@@ -94,6 +103,7 @@ class _NavItem extends StatelessWidget {
   const _NavItem({
     required this.icon,
     required this.activeIcon,
+    required this.label,
     required this.isActive,
     required this.onTap,
     required this.activeCharacter,
@@ -101,55 +111,70 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 72,
-        height: 64,
-        child: Stack(
-          alignment: Alignment.center,
-          clipBehavior: Clip.none,
-          children: [
-            if (isActive)
-              Positioned(
-                top: -24,
-                child: activeCharacter
-                    .animate()
-                    .scale(
-                      begin: const Offset(0.3, 0.3),
-                      end: const Offset(1.0, 1.0),
-                      duration: 300.ms,
-                      curve: Curves.elasticOut,
-                    )
-                    .moveY(begin: 12, end: 0, duration: 300.ms, curve: Curves.easeOutBack),
-              ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
+    return Semantics(
+      button: true,
+      label: label,
+      selected: isActive,
+      child: Tooltip(
+        message: label,
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: SizedBox(
+            width: 72,
+            height: 64,
+            child: Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
               children: [
-                const SizedBox(height: 12),
-                Icon(
-                  isActive ? activeIcon : icon,
-                  key: ValueKey(isActive),
-                  color: isActive
-                      ? AppColors.cream100
-                      : AppColors.textTertiary,
-                  size: 24,
-                ),
-                const SizedBox(height: 4),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeOutBack,
-                  width: isActive ? 6 : 0,
-                  height: isActive ? 6 : 0,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.cream60,
+                if (isActive)
+                  Positioned(
+                    top: -24,
+                    child: reduceMotion
+                        ? activeCharacter
+                        : activeCharacter
+                            .animate()
+                            .scale(
+                              begin: const Offset(0.3, 0.3),
+                              end: const Offset(1.0, 1.0),
+                              duration: 300.ms,
+                              curve: Curves.elasticOut,
+                            )
+                            .moveY(
+                                begin: 12,
+                                end: 0,
+                                duration: 300.ms,
+                                curve: Curves.easeOutBack),
                   ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 12),
+                    Icon(
+                      isActive ? activeIcon : icon,
+                      key: ValueKey(isActive),
+                      color: isActive
+                          ? AppColors.cream100
+                          : AppColors.textTertiary,
+                      size: 24,
+                    ),
+                    const SizedBox(height: 4),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeOutBack,
+                      width: isActive ? 6 : 0,
+                      height: isActive ? 6 : 0,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.cream60,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -158,7 +183,8 @@ class _NavItem extends StatelessWidget {
 
 class _CreateButton extends StatefulWidget {
   final VoidCallback onTap;
-  const _CreateButton({required this.onTap});
+  final VoidCallback? onLongPress;
+  const _CreateButton({required this.onTap, this.onLongPress});
 
   @override
   State<_CreateButton> createState() => _CreateButtonState();
@@ -207,19 +233,32 @@ class _CreateButtonState extends State<_CreateButton> with SingleTickerProviderS
         onTapDown: _handleTapDown,
         onTapUp: _handleTapUp,
         onTapCancel: _handleTapCancel,
-        child: Container(
-          width: 56,
-          height: 56,
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: AppColors.cream100,
-            shape: BoxShape.circle,
-            boxShadow: AppColors.shadowFloat,
-          ),
-          child: const Icon(
-            Icons.add_rounded,
-            color: AppColors.textOnCream,
-            size: 28,
+        onLongPress: widget.onLongPress == null
+            ? null
+            : () {
+                HapticFeedback.mediumImpact();
+                widget.onLongPress!();
+              },
+        child: Semantics(
+          button: true,
+          label: 'Create post',
+          child: Tooltip(
+            message: 'Create',
+            child: Container(
+              width: 56,
+              height: 56,
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: AppColors.cream100,
+                shape: BoxShape.circle,
+                boxShadow: AppColors.shadowFloat,
+              ),
+              child: const Icon(
+                Icons.add_rounded,
+                color: AppColors.textOnCream,
+                size: 28,
+              ),
+            ),
           ),
         ),
       ),
