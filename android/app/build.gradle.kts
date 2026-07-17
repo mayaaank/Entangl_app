@@ -3,7 +3,6 @@ plugins {
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
     id("com.google.gms.google-services")
-    id("com.google.firebase.appdistribution")
 }
 
 android {
@@ -12,6 +11,8 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // Required by flutter_local_notifications (and modern Android libs).
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -31,14 +32,18 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("debug")
-            firebaseAppDistribution {
-                releaseNotes = "Latest build"
-                testers = "k.pastelss@gmail.com, mayanksuryawanshi392@gmail.com, vaishw22@gmail.com, mansikulkarni2006@gmail.com, rekt11.cam@gmail.com"
-            }
+            // firebaseAppDistribution {
+            //     releaseNotes = "Latest build"
+            //     testers = "k.pastelss@gmail.com, mayanksuryawanshi392@gmail.com, vaishw22@gmail.com, mansikulkarni2006@gmail.com, rekt11.cam@gmail.com"
+            // }
         }
     }
 }
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
