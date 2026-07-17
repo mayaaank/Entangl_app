@@ -1,6 +1,12 @@
 # Architectural Analysis of the Flutter Project
 
+**Product:** Entangl  
+**Docs index:** [../README.md](../README.md) · [../DOCUMENTATION.md](../DOCUMENTATION.md)  
+**Related:** [ARCHITECTURE_AUDIT.md](ARCHITECTURE_AUDIT.md) · [../notifications/STATUS.md](../notifications/STATUS.md) · [../ux/UI_UX_AUDIT.md](../ux/UI_UX_AUDIT.md)
+
 This document is a production-style architectural review of the current Flutter application based on the actual source code in the repository.
+
+> **Path note:** Links to `lib/…` below are written as repo-root paths (`../../lib/…`) so they resolve from this file under `docs/architecture/`.
 
 ## 1. Executive Summary
 
@@ -39,10 +45,10 @@ The codebase shows a clear separation between:
 
 This separation is visible in files such as:
 
-- [lib/main.dart](lib/main.dart)
-- [lib/core/router/app_router.dart](lib/core/router/app_router.dart)
-- [lib/data/repositories/posts_repository.dart](lib/data/repositories/posts_repository.dart)
-- [lib/features/feed/providers/feed_provider.dart](lib/features/feed/providers/feed_provider.dart)
+- [lib/main.dart](../../lib/main.dart)
+- [lib/core/router/app_router.dart](../../lib/core/router/app_router.dart)
+- [lib/data/repositories/posts_repository.dart](../../lib/data/repositories/posts_repository.dart)
+- [lib/features/feed/providers/feed_provider.dart](../../lib/features/feed/providers/feed_provider.dart)
 
 ### Logical architecture diagram
 
@@ -62,19 +68,19 @@ flowchart LR
 - Presentation layer
   - Screens and widgets render the UI.
   - They consume providers and respond to state changes.
-  - Examples: [lib/features/auth/screens/login_screen.dart](lib/features/auth/screens/login_screen.dart), [lib/features/feed/screens/home_screen.dart](lib/features/feed/screens/home_screen.dart)
+  - Examples: [lib/features/auth/screens/login_screen.dart](../../lib/features/auth/screens/login_screen.dart), [lib/features/feed/screens/home_screen.dart](../../lib/features/feed/screens/home_screen.dart)
 
 - State layer
   - Riverpod providers own asynchronous operations and UI state.
-  - Examples: [lib/features/auth/providers/auth_provider.dart](lib/features/auth/providers/auth_provider.dart), [lib/features/post/providers/create_post_provider.dart](lib/features/post/providers/create_post_provider.dart)
+  - Examples: [lib/features/auth/providers/auth_provider.dart](../../lib/features/auth/providers/auth_provider.dart), [lib/features/post/providers/create_post_provider.dart](../../lib/features/post/providers/create_post_provider.dart)
 
 - Data layer
   - Repositories isolate Supabase operations from UI code.
-  - Examples: [lib/data/repositories/users_repository.dart](lib/data/repositories/users_repository.dart), [lib/data/repositories/notifications_repository.dart](lib/data/repositories/notifications_repository.dart)
+  - Examples: [lib/data/repositories/users_repository.dart](../../lib/data/repositories/users_repository.dart), [lib/data/repositories/notifications_repository.dart](../../lib/data/repositories/notifications_repository.dart)
 
 - Infrastructure layer
   - Routing, theme, app lifecycle, config, and shared utilities.
-  - Examples: [lib/core/router/app_router.dart](lib/core/router/app_router.dart), [lib/core/theme/app_theme.dart](lib/core/theme/app_theme.dart), [lib/core/utils/app_lifecycle.dart](lib/core/utils/app_lifecycle.dart)
+  - Examples: [lib/core/router/app_router.dart](../../lib/core/router/app_router.dart), [lib/core/theme/app_theme.dart](../../lib/core/theme/app_theme.dart), [lib/core/utils/app_lifecycle.dart](../../lib/core/utils/app_lifecycle.dart)
 
 ## 3. Project Structure Analysis
 
@@ -88,11 +94,11 @@ flowchart LR
 
 ### Main source folders
 
-- [lib/main.dart](lib/main.dart): application entrypoint and Supabase bootstrap.
-- [lib/core](lib/core): shared infrastructure such as routing, theme, constants, and utils.
-- [lib/data](lib/data): models, repositories, and backend service abstraction.
-- [lib/features](lib/features): business features and their presentation/state/data layers.
-- [lib/shared](lib/shared): reusable UI widgets and app-wide shared providers.
+- [lib/main.dart](../../lib/main.dart): application entrypoint and Supabase bootstrap.
+- [lib/core](../../lib/core): shared infrastructure such as routing, theme, constants, and utils.
+- [lib/data](../../lib/data): models, repositories, and backend service abstraction.
+- [lib/features](../../lib/features): business features and their presentation/state/data layers.
+- [lib/shared](../../lib/shared): reusable UI widgets and app-wide shared providers.
 
 ### Folder interaction model
 
@@ -105,9 +111,9 @@ The cleanest mental model is:
 
 ### Which folders are infrastructure vs business logic vs presentation
 
-- Infrastructure: [lib/core](lib/core)
-- Business logic: [lib/features](lib/features), [lib/data/repositories](lib/data/repositories)
-- Presentation: [lib/features/\*/screens](lib/features), [lib/shared/widgets](lib/shared/widgets)
+- Infrastructure: [lib/core](../../lib/core)
+- Business logic: [lib/features](../../lib/features), [lib/data/repositories](../../lib/data/repositories)
+- Presentation: [lib/features/\*/screens](../../lib/features), [lib/shared/widgets](../../lib/shared/widgets)
 
 ### Which folders should not directly communicate
 
@@ -122,82 +128,89 @@ A healthy rule for this codebase is:
 ### Authentication
 
 - Purpose: sign in, sign up, and sign out users.
-- Entry points: [lib/features/auth/screens/login_screen.dart](lib/features/auth/screens/login_screen.dart), [lib/features/auth/screens/register_screen.dart](lib/features/auth/screens/register_screen.dart), [lib/features/auth/screens/splash_screen.dart](lib/features/auth/screens/splash_screen.dart)
-- State: [lib/features/auth/providers/auth_provider.dart](lib/features/auth/providers/auth_provider.dart)
-- Repository: [lib/data/repositories/auth_repository.dart](lib/data/repositories/auth_repository.dart)
+- Entry points: [lib/features/auth/screens/login_screen.dart](../../lib/features/auth/screens/login_screen.dart), [lib/features/auth/screens/register_screen.dart](../../lib/features/auth/screens/register_screen.dart), [lib/features/auth/screens/splash_screen.dart](../../lib/features/auth/screens/splash_screen.dart)
+- State: [lib/features/auth/providers/auth_provider.dart](../../lib/features/auth/providers/auth_provider.dart)
+- Repository: [lib/data/repositories/auth_repository.dart](../../lib/data/repositories/auth_repository.dart)
 - Backend: Supabase Auth
-- Navigation: redirect logic lives in [lib/core/router/app_router.dart](lib/core/router/app_router.dart)
+- Navigation: redirect logic lives in [lib/core/router/app_router.dart](../../lib/core/router/app_router.dart)
 
 ### Feed
 
 - Purpose: display posts from the community and support reactions.
-- Entry point: [lib/features/feed/screens/home_screen.dart](lib/features/feed/screens/home_screen.dart)
-- Provider: [lib/features/feed/providers/feed_provider.dart](lib/features/feed/providers/feed_provider.dart)
-- Reusable UI: [lib/shared/widgets/post_card.dart](lib/shared/widgets/post_card.dart)
-- Data source: [lib/data/repositories/posts_repository.dart](lib/data/repositories/posts_repository.dart)
+- Entry point: [lib/features/feed/screens/home_screen.dart](../../lib/features/feed/screens/home_screen.dart)
+- Provider: [lib/features/feed/providers/feed_provider.dart](../../lib/features/feed/providers/feed_provider.dart)
+- Reusable UI: [lib/shared/widgets/post_card.dart](../../lib/shared/widgets/post_card.dart)
+- Data source: [lib/data/repositories/posts_repository.dart](../../lib/data/repositories/posts_repository.dart)
 - Navigation: opens create post, profile, and search from the home UI.
 
 ### Create Post
 
 - Purpose: create a post with optional image upload.
-- Entry point: [lib/features/post/screens/create_post_screen.dart](lib/features/post/screens/create_post_screen.dart)
-- Provider: [lib/features/post/providers/create_post_provider.dart](lib/features/post/providers/create_post_provider.dart)
-- Reusable UI: [lib/features/post/widgets/create_post_form.dart](lib/features/post/widgets/create_post_form.dart)
-- Repository: [lib/data/repositories/posts_repository.dart](lib/data/repositories/posts_repository.dart)
+- Entry point: [lib/features/post/screens/create_post_screen.dart](../../lib/features/post/screens/create_post_screen.dart)
+- Provider: [lib/features/post/providers/create_post_provider.dart](../../lib/features/post/providers/create_post_provider.dart)
+- Reusable UI: [lib/features/post/widgets/create_post_form.dart](../../lib/features/post/widgets/create_post_form.dart)
+- Repository: [lib/data/repositories/posts_repository.dart](../../lib/data/repositories/posts_repository.dart)
 - Dependency: invalidates feed and profile providers after submission.
 
 ### Comments
 
 - Purpose: view and add comments and replies on posts.
-- Provider: [lib/features/comments/providers/comments_provider.dart](lib/features/comments/providers/comments_provider.dart)
-- Repository: [lib/data/repositories/comments_repository.dart](lib/data/repositories/comments_repository.dart)
-- UI: [lib/features/comments/widgets/comments_sheet.dart](lib/features/comments/widgets/comments_sheet.dart)
+- Provider: [lib/features/comments/providers/comments_provider.dart](../../lib/features/comments/providers/comments_provider.dart)
+- Repository: [lib/data/repositories/comments_repository.dart](../../lib/data/repositories/comments_repository.dart)
+- UI: [lib/features/comments/widgets/comments_sheet.dart](../../lib/features/comments/widgets/comments_sheet.dart)
 - Flow: comment input state is separate from the actual comments list state.
 
 ### Stories
 
 - Purpose: show temporary stories and allow story creation and viewing.
-- Provider: [lib/features/stories/providers/stories_provider.dart](lib/features/stories/providers/stories_provider.dart)
-- Repository: [lib/data/repositories/stories_repository.dart](lib/data/repositories/stories_repository.dart)
-- Screens/widgets: [lib/features/stories/screens/story_viewer_screen.dart](lib/features/stories/screens/story_viewer_screen.dart), [lib/features/stories/widgets/create_story_sheet.dart](lib/features/stories/widgets/create_story_sheet.dart)
-- Data model: [lib/data/models/story_model.dart](lib/data/models/story_model.dart)
+- Provider: [lib/features/stories/providers/stories_provider.dart](../../lib/features/stories/providers/stories_provider.dart)
+- Repository: [lib/data/repositories/stories_repository.dart](../../lib/data/repositories/stories_repository.dart)
+- Screens/widgets: [lib/features/stories/screens/story_viewer_screen.dart](../../lib/features/stories/screens/story_viewer_screen.dart), [lib/features/stories/widgets/create_story_sheet.dart](../../lib/features/stories/widgets/create_story_sheet.dart)
+- Data model: [lib/data/models/story_model.dart](../../lib/data/models/story_model.dart)
 
 ### Notifications
 
-- Purpose: display unread and read social notifications.
-- Provider: [lib/features/notifications/providers/notifications_provider.dart](lib/features/notifications/providers/notifications_provider.dart)
-- Repository: [lib/data/repositories/notifications_repository.dart](lib/data/repositories/notifications_repository.dart)
-- UI: [lib/features/notifications/screens/notifications_screen.dart](lib/features/notifications/screens/notifications_screen.dart)
-- Integration: unread count is invalidated when notifications change.
+- Purpose: in-app activity inbox + optional **mobile FCM** push (web push skipped).
+- Provider: [lib/features/notifications/providers/notifications_provider.dart](../../lib/features/notifications/providers/notifications_provider.dart)
+- Push bootstrap: [lib/features/notifications/providers/push_bootstrap_provider.dart](../../lib/features/notifications/providers/push_bootstrap_provider.dart)
+- Deep links: [lib/features/notifications/utils/notification_navigation.dart](../../lib/features/notifications/utils/notification_navigation.dart)
+- Repository: [lib/data/repositories/notifications_repository.dart](../../lib/data/repositories/notifications_repository.dart)
+- Tokens: [lib/data/repositories/device_tokens_repository.dart](../../lib/data/repositories/device_tokens_repository.dart)
+- FCM service: [lib/data/services/notification_service.dart](../../lib/data/services/notification_service.dart)
+- UI: [lib/features/notifications/screens/notifications_screen.dart](../../lib/features/notifications/screens/notifications_screen.dart)
+- Backend: Postgres triggers → `notifications`; Edge Function `send-push` + `device_tokens` for FCM
+- Status docs: [../notifications/STATUS.md](../notifications/STATUS.md), [../notifications/PENDING.md](../notifications/PENDING.md), [../notifications/PUSH.md](../notifications/PUSH.md)
+- Docs index: [../README.md](../README.md)
+- **Not yet:** Supabase Realtime channel for in-app live badge; RPC `get_unread_notification_count` in client
 
 ### Profile
 
 - Purpose: show own or other profiles, stats, posts, and follow actions.
-- Screen: [lib/features/profile/screens/profile_screen.dart](lib/features/profile/screens/profile_screen.dart)
-- Provider: [lib/features/profile/providers/profile_provider.dart](lib/features/profile/providers/profile_provider.dart)
-- Repositories: [lib/data/repositories/users_repository.dart](lib/data/repositories/users_repository.dart), [lib/data/repositories/posts_repository.dart](lib/data/repositories/posts_repository.dart)
-- Reusable UI: [lib/features/profile/widgets/profile_header.dart](lib/features/profile/widgets/profile_header.dart), [lib/features/profile/widgets/follow_list.dart](lib/features/profile/widgets/follow_list.dart)
+- Screen: [lib/features/profile/screens/profile_screen.dart](../../lib/features/profile/screens/profile_screen.dart)
+- Provider: [lib/features/profile/providers/profile_provider.dart](../../lib/features/profile/providers/profile_provider.dart)
+- Repositories: [lib/data/repositories/users_repository.dart](../../lib/data/repositories/users_repository.dart), [lib/data/repositories/posts_repository.dart](../../lib/data/repositories/posts_repository.dart)
+- Reusable UI: [lib/features/profile/widgets/profile_header.dart](../../lib/features/profile/widgets/profile_header.dart), [lib/features/profile/widgets/follow_list.dart](../../lib/features/profile/widgets/follow_list.dart)
 
 ### Search
 
 - Purpose: search users by name or username.
-- Screen: [lib/features/search/screens/search_screen.dart](lib/features/search/screens/search_screen.dart)
-- Provider: [lib/features/search/providers/search_provider.dart](lib/features/search/providers/search_provider.dart)
-- Repository: [lib/data/repositories/users_repository.dart](lib/data/repositories/users_repository.dart)
+- Screen: [lib/features/search/screens/search_screen.dart](../../lib/features/search/screens/search_screen.dart)
+- Provider: [lib/features/search/providers/search_provider.dart](../../lib/features/search/providers/search_provider.dart)
+- Repository: [lib/data/repositories/users_repository.dart](../../lib/data/repositories/users_repository.dart)
 
 ### Settings
 
 - Purpose: account and app preference UI.
-- Screen: [lib/features/settings/screens/settings_screen.dart](lib/features/settings/screens/settings_screen.dart)
-- State: [lib/features/settings/providers/settings_provider.dart](lib/features/settings/providers/settings_provider.dart)
+- Screen: [lib/features/settings/screens/settings_screen.dart](../../lib/features/settings/screens/settings_screen.dart)
+- State: [lib/features/settings/providers/settings_provider.dart](../../lib/features/settings/providers/settings_provider.dart)
 
 ## 5. Data Flow Analysis
 
 ### Login
 
-1. User enters credentials in [lib/features/auth/screens/login_screen.dart](lib/features/auth/screens/login_screen.dart).
+1. User enters credentials in [lib/features/auth/screens/login_screen.dart](../../lib/features/auth/screens/login_screen.dart).
 2. The screen calls the auth notifier.
-3. The notifier invokes [lib/data/repositories/auth_repository.dart](lib/data/repositories/auth_repository.dart).
+3. The notifier invokes [lib/data/repositories/auth_repository.dart](../../lib/data/repositories/auth_repository.dart).
 4. The repository calls Supabase Auth.
 5. On success, the router redirect logic notices a session and sends the user to the home route.
 
@@ -210,10 +223,10 @@ A healthy rule for this codebase is:
 
 ### Feed
 
-1. The home screen watches [lib/features/feed/providers/feed_provider.dart](lib/features/feed/providers/feed_provider.dart).
+1. The home screen watches [lib/features/feed/providers/feed_provider.dart](../../lib/features/feed/providers/feed_provider.dart).
 2. The provider requests posts from the posts repository.
 3. The repository queries the posts table with related profile, likes, dislikes, and comments data.
-4. The provider maps rows into [lib/data/models/post_model.dart](lib/data/models/post_model.dart).
+4. The provider maps rows into [lib/data/models/post_model.dart](../../lib/data/models/post_model.dart).
 5. The UI re-renders and shows the feed.
 
 ### Create Post
@@ -271,13 +284,13 @@ The project uses Riverpod with a mix of:
 
 ### Where providers are created
 
-- Auth: [lib/features/auth/providers/auth_provider.dart](lib/features/auth/providers/auth_provider.dart)
-- Feed: [lib/features/feed/providers/feed_provider.dart](lib/features/feed/providers/feed_provider.dart)
-- Create post: [lib/features/post/providers/create_post_provider.dart](lib/features/post/providers/create_post_provider.dart)
-- Profile: [lib/features/profile/providers/profile_provider.dart](lib/features/profile/providers/profile_provider.dart)
-- Notifications: [lib/features/notifications/providers/notifications_provider.dart](lib/features/notifications/providers/notifications_provider.dart)
-- Search: [lib/features/search/providers/search_provider.dart](lib/features/search/providers/search_provider.dart)
-- Stories: [lib/features/stories/providers/stories_provider.dart](lib/features/stories/providers/stories_provider.dart)
+- Auth: [lib/features/auth/providers/auth_provider.dart](../../lib/features/auth/providers/auth_provider.dart)
+- Feed: [lib/features/feed/providers/feed_provider.dart](../../lib/features/feed/providers/feed_provider.dart)
+- Create post: [lib/features/post/providers/create_post_provider.dart](../../lib/features/post/providers/create_post_provider.dart)
+- Profile: [lib/features/profile/providers/profile_provider.dart](../../lib/features/profile/providers/profile_provider.dart)
+- Notifications: [lib/features/notifications/providers/notifications_provider.dart](../../lib/features/notifications/providers/notifications_provider.dart)
+- Search: [lib/features/search/providers/search_provider.dart](../../lib/features/search/providers/search_provider.dart)
+- Stories: [lib/features/stories/providers/stories_provider.dart](../../lib/features/stories/providers/stories_provider.dart)
 
 ### State propagation model
 
@@ -306,11 +319,11 @@ The general flow is:
 
 ### Supabase initialization
 
-The app initializes Supabase in [lib/main.dart](lib/main.dart) during startup. The configuration comes from [lib/core/secrets.dart](lib/core/secrets.dart).
+The app initializes Supabase in [lib/main.dart](../../lib/main.dart) during startup. The configuration comes from [lib/core/secrets.dart](../../lib/core/secrets.dart).
 
 ### Authentication flow
 
-Authentication is handled through Supabase Auth, wrapped by [lib/data/repositories/auth_repository.dart](lib/data/repositories/auth_repository.dart). The router performs redirects based on the current session.
+Authentication is handled through Supabase Auth, wrapped by [lib/data/repositories/auth_repository.dart](../../lib/data/repositories/auth_repository.dart). The router performs redirects based on the current session.
 
 ### Database interactions
 
@@ -407,7 +420,7 @@ The repository layer centralizes all backend access and prevents feature code fr
 
 ## 10. Navigation
 
-The navigation system is implemented with GoRouter in [lib/core/router/app_router.dart](lib/core/router/app_router.dart).
+The navigation system is implemented with GoRouter in [lib/core/router/app_router.dart](../../lib/core/router/app_router.dart).
 
 ### Route structure
 
@@ -448,15 +461,15 @@ The UI is built with a composition-oriented widget approach.
 
 ### Reusable widgets
 
-- [lib/shared/widgets/post_card.dart](lib/shared/widgets/post_card.dart): renders a social post card
-- [lib/shared/widgets/avatar_widget.dart](lib/shared/widgets/avatar_widget.dart): consistent avatar rendering
-- [lib/shared/widgets/connect_nav_bar.dart](lib/shared/widgets/connect_nav_bar.dart): bottom navigation bar
-- [lib/shared/widgets/gradient_button.dart](lib/shared/widgets/gradient_button.dart): shared action button styling
-- [lib/shared/widgets/gradient_text.dart](lib/shared/widgets/gradient_text.dart): reused text styling
+- [lib/shared/widgets/post_card.dart](../../lib/shared/widgets/post_card.dart): renders a social post card
+- [lib/shared/widgets/avatar_widget.dart](../../lib/shared/widgets/avatar_widget.dart): consistent avatar rendering
+- [lib/shared/widgets/connect_nav_bar.dart](../../lib/shared/widgets/connect_nav_bar.dart): bottom navigation bar
+- [lib/shared/widgets/gradient_button.dart](../../lib/shared/widgets/gradient_button.dart): shared action button styling
+- [lib/shared/widgets/gradient_text.dart](../../lib/shared/widgets/gradient_text.dart): reused text styling
 
 ### Theme system
 
-The app uses a custom theme layer via [lib/core/theme/app_theme.dart](lib/core/theme/app_theme.dart), [lib/core/theme/app_colors.dart](lib/core/theme/app_colors.dart), and [lib/core/theme/app_text_styles.dart](lib/core/theme/app_text_styles.dart).
+The app uses a custom theme layer via [lib/core/theme/app_theme.dart](../../lib/core/theme/app_theme.dart), [lib/core/theme/app_colors.dart](../../lib/core/theme/app_colors.dart), and [lib/core/theme/app_text_styles.dart](../../lib/core/theme/app_text_styles.dart).
 
 ### UI composition pattern
 
@@ -475,10 +488,11 @@ From [pubspec.yaml](pubspec.yaml):
 - video_player: video support
 - cached_network_image: image caching
 - shared_preferences: local persistence
-- flutter_secure_storage: secure local storage support
+- flutter_secure_storage: declared (session persistence primarily via Supabase)
 - shimmer: skeleton loading states
 - flutter_animate: animation
 - google_fonts: typography
+- firebase_core / firebase_messaging / flutter_local_notifications: **mobile FCM push**
 
 ### Why these dependencies matter
 
@@ -515,7 +529,7 @@ The app is built as a modern Flutter product app rather than a simple CRUD demo.
 
 ### Risks and concerns
 
-- The configuration file [lib/core/secrets.dart](lib/core/secrets.dart) contains runtime values and should be treated as sensitive infrastructure.
+- The configuration file [lib/core/secrets.dart](../../lib/core/secrets.dart) contains runtime values and should be treated as sensitive infrastructure.
 - The app appears to rely on the anonymous Supabase key for client-side access; this is common for public apps, but row-level security and database policies must be enforced on the backend.
 - The current repository methods assume the current user is authenticated and use direct client calls without an explicit domain-layer permission policy.
 

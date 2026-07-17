@@ -1,10 +1,15 @@
-# Connect - Product & Technical Documentation Suite
+# Entangl — Product & Technical Documentation Suite
 
 **Version:** 1.0.0+1  
-**Last Updated:** May 17, 2026  
+**Last Updated:** July 18, 2026  
 **Framework:** Flutter (SDK >=3.0.0)  
-**Backend:** Supabase (PostgreSQL, Auth, Storage, Realtime)  
+**Backend:** Supabase (PostgreSQL, Auth, Storage) + **FCM** for mobile push  
 **State Management:** Riverpod  
+
+> **Documentation index:** [README.md](README.md)  
+> **Architecture:** [architecture/FOLDER_STRUCTURE.md](architecture/FOLDER_STRUCTURE.md) · [architecture/ARCHITECTURE_AUDIT.md](architecture/ARCHITECTURE_AUDIT.md)  
+> **UX audit:** [ux/UI_UX_AUDIT.md](ux/UI_UX_AUDIT.md)  
+> **Notifications:** [notifications/STATUS.md](notifications/STATUS.md) · [notifications/PENDING.md](notifications/PENDING.md) · [notifications/PUSH.md](notifications/PUSH.md)
 
 ---
 
@@ -54,7 +59,7 @@ Connect is a modern social media platform built with Flutter and powered by Supa
 - **Ephemeral stories:** Image and video stories that expire after 24 hours
 - **Rich social graph:** Follow/follower relationships with profile statistics
 - **Threaded comments:** Nested reply support on posts
-- **Activity notifications:** Real-time notification feed for social interactions
+- **Activity notifications:** In-app notification feed (DB triggers) plus optional **mobile FCM** push; deep links by type (follow → profile, like/comment → post context)
 - **User search:** Discover other users by username or full name
 
 ### 1.3 Target Audience
@@ -262,15 +267,21 @@ Social media users seeking a platform with both positive (like) and negative (di
 | Reply | reply | Green (#22C55E) | Someone replies to your comment |
 
 **Interactions:**
-- Tap notification: Marks as read, navigates to actor's profile
+- Tap notification: Marks as read, then **type-aware deep link**
+  - `follow` → actor profile
+  - `like` / `dislike` → post preview sheet (comments / profile actions)
+  - `comment` / `reply` → comments sheet for that post
+  - Missing `post_id` → actor profile fallback
 - Swipe to dismiss: Deletes the notification
-- Unread indicator: 6px primary-colored dot on left edge
-- Post thumbnail: 44x44 image shown if notification has associated post
+- Unread indicator: 6px cream dot on left edge; home bell uses unread badge
+- Post thumbnail: 40×40 image when notification has associated post
 
 **Empty State:**
-- "You're all caught up" text
+- Mascot + "You're all caught up"
 
-**Page Size:** 30 notifications
+**Page Size:** 50 notifications (repository limit)
+
+**Push (mobile):** FCM via `NotificationService` + `device_tokens`; see [notifications/PUSH.md](notifications/PUSH.md) and [notifications/STATUS.md](notifications/STATUS.md).
 
 ---
 
@@ -426,12 +437,12 @@ Social media users seeking a platform with both positive (like) and negative (di
 **1. Notifications (powered by SharedPreferences):**
 | Setting | Key | Default |
 |---------|-----|---------|
-| Push Notifications | push_enabled | false |
-| Followers | followers_enabled | false |
-| Likes | likes_enabled | false |
-| Dislikes | dislikes_enabled | false |
-| Comments | comments_enabled | false |
-| Replies | replies_enabled | false |
+| Push Notifications | `notif_push` | **true** (master FCM on/off) |
+| Followers | `notif_followers` | true (**local only** — not enforced on server push yet) |
+| Likes | `notif_likes` | true (local only) |
+| Dislikes | `notif_dislikes` | false (local only) |
+| Comments | `notif_comments` | true (local only) |
+| Replies | `notif_replies` | true (local only) |
 
 **2. Account (stubs):**
 - Change Password: Opens stub snackbar ("Coming soon")
@@ -1414,7 +1425,9 @@ These screens are pushed via `Navigator.push` rather than GoRouter:
 | Auth | Email/password authentication, session management |
 | Database | PostgreSQL via REST API (all data operations) |
 | Storage | File storage for avatars, post images, story media |
-| Realtime | Not actively used (no subscriptions in codebase) |
+| Realtime (Postgres channels) | Not used in Flutter app |
+| FCM mobile push | Implemented (`NotificationService`, `device_tokens`, Edge `send-push`) |
+| Web Push | Skipped (`push_subscriptions` table unused by app) |
 
 **Configuration:**
 - URL: `https://lmohyfcmiftvuluhyaqh.supabase.co`
@@ -1468,15 +1481,19 @@ These screens are pushed via `Navigator.push` rather than GoRouter:
 
 ### 14.1 Real-Time Features
 
-**Current Status:** Supabase Realtime subscriptions are **NOT** actively used in the codebase. Despite `supabase_flutter` supporting real-time subscriptions, all data fetching is request-based (polling/refresh-on-demand).
+**Current Status (2026-07-18):**
 
-The `authStateProvider` is the only stream-based provider, listening to Supabase auth state changes (session creation/deletion).
+| Channel | Status |
+|---------|--------|
+| Supabase **Realtime** (`onPostgresChanges`) | **Not used** in Flutter for feed/notifications |
+| **Auth** stream | Used (`authStateProvider`) |
+| **FCM** mobile push | Implemented — delivery when app is background/killed; foreground FCM also refreshes badge/list |
+| In-app list without FCM | Pull-to-refresh / open screen / mark-read invalidation |
 
 **Implications:**
-- Feed does not update automatically when new posts are created
-- Notifications do not appear in real-time
-- Follow status changes are not pushed to followers
-- Stories do not update in real-time
+- Feed does not auto-update via Realtime when others post
+- Notification **rows** appear on next fetch; **live in-app badge without FCM** still requires a Realtime subscription (planned — see [notifications/PENDING.md](notifications/PENDING.md))
+- OS push (Android/iOS) is separate from Supabase Realtime
 
 ### 14.2 Asynchronous Operations
 
@@ -2110,14 +2127,16 @@ class MyWidget extends ConsumerWidget {
 
 | Limitation | Description | Impact |
 |------------|-------------|--------|
-| **No Real-Time Updates** | No Supabase Realtime subscriptions | Users must manually refresh to see new content |
+| **No Supabase Realtime for feed/notif list** | No Postgres channel subscriptions in app | In-app list/badge need pull or FCM foreground refresh |
+| **Unread count not RPC** | Client counts unread rows | Heavier than `get_unread_notification_count` |
+| **Type prefs local-only** | Settings sub-toggles do not filter FCM send | May still receive muted types |
 | **No Image Compression** | Images uploaded at original size | Slow uploads, high storage usage |
 | **No Story Cleanup** | Expired stories never deleted | Database and storage grow indefinitely |
 | **No Pagination for Comments** | All comments loaded at once | Performance degradation on posts with many comments |
-| **No Search Debouncing** | Every keystroke triggers search | Unnecessary API calls |
+| **Search debounce** | Implemented in custom search screen (300ms) | — resolved |
 | **Single Theme** | Light theme defined but not used | No user theme choice |
-| **No Admin Features** | No moderation tools | Cannot manage content or users |
-| **No Push Notifications** | Settings exist but no FCM/APNs integration | Notifications only visible in-app |
+| **Admin features** | Admin requests + approval flow exist | Partial (not full moderation suite) |
+| **Push notifications** | FCM + Edge Function implemented | Ops verify + iOS plist may still be needed |
 | **No Post Editing** | Posts can be created and deleted but not edited | Users cannot fix typos |
 | **No Direct Messaging** | No chat/messaging feature | Limited social interaction |
 | **No Hashtags/Mentions** | No content discovery mechanism | Hard to find relevant content |
@@ -2133,12 +2152,13 @@ class MyWidget extends ConsumerWidget {
 | **HIGH** | Environment variables | Move Supabase credentials to .env file |
 | **HIGH** | RLS policies | Ensure all tables have proper Row Level Security |
 | **HIGH** | Write tests | Implement meaningful widget and unit tests |
-| **MEDIUM** | Supabase Realtime | Add subscriptions for live feed updates |
+| **HIGH** | Notification Realtime + RPC count | See [notifications/PENDING.md](notifications/PENDING.md) |
+| **MEDIUM** | Supabase Realtime for feed | Optional live feed inserts |
 | **MEDIUM** | Image compression | Compress images before upload |
 | **MEDIUM** | Story cleanup | Implement edge function to delete expired stories |
-| **MEDIUM** | Search debouncing | Add 300ms debounce to search queries |
+| **MEDIUM** | Server notification prefs | Enforce Settings type toggles in `send-push` |
 | **MEDIUM** | Feed caching | Cache feed locally for offline viewing |
-| **MEDIUM** | Push notifications | Integrate FCM/APNs for real-time notifications |
+| **LOW** | iOS FCM readiness | `GoogleService-Info.plist` + APNs if shipping iOS push |
 | **LOW** | Light theme | Activate light theme with user toggle |
 | **LOW** | Post editing | Add edit functionality for posts |
 | **LOW** | Direct messaging | Implement real-time chat |

@@ -1,16 +1,29 @@
-# Connect App
+# Entangl
 
-Connect is a modern social media platform built with Flutter and powered by Supabase.
+Flutter social app (posts, stories, comments, reactions, profiles) with **Supabase** (Auth, Postgres, Storage) and **FCM** for mobile push.
 
-## Getting Started
+## Documentation
 
-This project is a starting point for a Flutter application.
+All detailed docs live under [`docs/`](docs/README.md):
 
-A few resources to get you started if this is your first Flutter project:
+| Area | Link |
+|------|------|
+| Docs index | [docs/README.md](docs/README.md) |
+| Product & technical suite | [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md) |
+| Architecture map | [docs/architecture/FOLDER_STRUCTURE.md](docs/architecture/FOLDER_STRUCTURE.md) |
+| Architecture audit | [docs/architecture/ARCHITECTURE_AUDIT.md](docs/architecture/ARCHITECTURE_AUDIT.md) |
+| Notifications (status) | [docs/notifications/STATUS.md](docs/notifications/STATUS.md) |
+| Notifications (pending) | [docs/notifications/PENDING.md](docs/notifications/PENDING.md) |
+| FCM push ops | [docs/notifications/PUSH.md](docs/notifications/PUSH.md) |
+| UX audit | [docs/ux/UI_UX_AUDIT.md](docs/ux/UI_UX_AUDIT.md) |
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Getting started
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter pub get
+# Copy secrets (gitignored): lib/core/secrets.dart from project template
+flutter run
+```
+
+Requires Flutter SDK `>=3.0.0` and a configured Supabase project.  
+For push setup, see [docs/notifications/PUSH.md](docs/notifications/PUSH.md).
