@@ -50,7 +50,9 @@ class EntanglApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Entangl',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.light,
       routerConfig: router,
       builder: (context, child) => PushNotificationBinder(
         child: AppLifecycleWrapper(

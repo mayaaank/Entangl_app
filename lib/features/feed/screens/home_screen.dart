@@ -27,7 +27,7 @@ class HomeScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           color: AppColors.inkMid,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          border: Border.all(color: AppColors.borderSubtle, width: 0.5),
+          border: Border.all(color: AppColors.borderCard, width: 2),
         ),
         padding: EdgeInsets.fromLTRB(
           20,
@@ -42,14 +42,23 @@ class HomeScreen extends ConsumerWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.textMuted.withOpacity(0.3),
+                color: AppColors.textMuted.withOpacity(0.5),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
             const SizedBox(height: 16),
             ListTile(
-              leading: const Icon(Icons.edit_outlined,
-                  color: AppColors.cream100),
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.pastelYellow,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.borderCard, width: 1.5),
+                ),
+                child: const Icon(Icons.edit_outlined,
+                    color: AppColors.textPrimary, size: 20),
+              ),
               title: Text('New post',
                   style: AppTextStyles.labelLarge
                       .copyWith(color: AppColors.textPrimary)),
@@ -62,8 +71,17 @@ class HomeScreen extends ConsumerWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.auto_awesome_rounded,
-                  color: AppColors.cream100),
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.pastelLavender,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.borderCard, width: 1.5),
+                ),
+                child: const Icon(Icons.auto_awesome_rounded,
+                    color: AppColors.textPrimary, size: 20),
+              ),
               title: Text('New story',
                   style: AppTextStyles.labelLarge
                       .copyWith(color: AppColors.textPrimary)),
@@ -97,9 +115,15 @@ class HomeScreen extends ConsumerWidget {
         onTap: (i) {
           switch (i) {
             case 1:
-              context.push(AppRoutes.createPost);
+              context.push(AppRoutes.search);
               break;
             case 2:
+              context.push(AppRoutes.createPost);
+              break;
+            case 3:
+              context.push(AppRoutes.notifications);
+              break;
+            case 4:
               context.push(AppRoutes.profile);
               break;
           }
@@ -145,8 +169,8 @@ class _HomeBodyState extends ConsumerState<_HomeBody> {
     final feedAsync = ref.watch(feedProvider);
     final feedNotifier = ref.read(feedProvider.notifier);
 
-    // Header height: status bar + name row (52) + stories (96) + divider (1)
-    final headerHeight = top + 52.0 + 96.0 + 1.0;
+    // Header: status + brand row (52) + stories (100)
+    final headerHeight = top + 52.0 + 100.0;
 
     return RefreshIndicator(
       color: AppColors.cream100,
@@ -173,34 +197,30 @@ class _HomeBodyState extends ConsumerState<_HomeBody> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: top + 10),
+                    SizedBox(height: top + 8),
                     Padding(
                       padding:
-                          const EdgeInsets.only(left: 20, right: 8, bottom: 4),
+                          const EdgeInsets.only(left: 20, right: 12, bottom: 4),
                       child: Row(
                         children: [
                           GradientText(
                             'entangl',
-                            style: AppTextStyles.displayLg.copyWith(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: -0.8,
-                            ),
+                            style: AppTextStyles.brandWordmark,
+                          ),
+                          const SizedBox(width: 6),
+                          const GhostMascot(
+                            expression: GhostExpression.waving,
+                            size: 28,
+                            animate: true,
                           ),
                           const Spacer(),
-                          _SearchButton(),
                           _NotifBell(),
                         ],
                       ),
                     ),
                     const SizedBox(
-                      height: 96,
+                      height: 100,
                       child: StoryCirclesRow(),
-                    ),
-                    Container(
-                      height: 1,
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      color: AppColors.borderSubtle,
                     ),
                   ],
                 ),
@@ -208,7 +228,6 @@ class _HomeBodyState extends ConsumerState<_HomeBody> {
             ),
           ),
 
-          // Prefer previous data over a blank loading state.
           if (feedAsync.isLoading && !feedAsync.hasValue)
             const FeedSkeletonList()
           else
@@ -236,7 +255,7 @@ class _HomeBodyState extends ConsumerState<_HomeBody> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'The connection failed to resolve. Check your network connection.',
+                          'Check your network and try again.',
                           textAlign: TextAlign.center,
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.textTertiary,
@@ -318,7 +337,7 @@ class _HomeBodyState extends ConsumerState<_HomeBody> {
                                     width: 20,
                                     height: 20,
                                     child: CircularProgressIndicator(
-                                      strokeWidth: 1.5,
+                                      strokeWidth: 2,
                                       color: feedNotifier.isLoadingMore
                                           ? AppColors.cream100
                                           : AppColors.cream100.withOpacity(0.4),
@@ -340,26 +359,12 @@ class _HomeBodyState extends ConsumerState<_HomeBody> {
   }
 }
 
-class _SearchButton extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return IconButton(
-      tooltip: 'Search users',
-      onPressed: () => context.push(AppRoutes.search),
-      icon: const Icon(
-        Icons.search_rounded,
-        color: AppColors.textSecondary,
-        size: 22,
-      ),
-    );
-  }
-}
-
 class _NotifBell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final count = ref.watch(unreadCountProvider).valueOrNull ?? 0;
     return Stack(
+      clipBehavior: Clip.none,
       children: [
         IconButton(
           tooltip: count > 0
@@ -368,22 +373,23 @@ class _NotifBell extends ConsumerWidget {
           onPressed: () => context.push(AppRoutes.notifications),
           icon: const Icon(
             Icons.notifications_outlined,
-            color: AppColors.textSecondary,
-            size: 22,
+            color: AppColors.textPrimary,
+            size: 24,
           ),
         ),
         if (count > 0)
           Positioned(
-            right: 8,
-            top: 8,
+            right: 10,
+            top: 10,
             child: Semantics(
               label: '$count unread notifications',
               child: Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: AppColors.cream100,
+                width: 9,
+                height: 9,
+                decoration: BoxDecoration(
+                  color: AppColors.like,
                   shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.inkBase, width: 1.5),
                 ),
               ),
             ),

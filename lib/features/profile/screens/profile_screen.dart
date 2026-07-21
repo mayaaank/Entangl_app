@@ -92,12 +92,18 @@ class _ProfileScaffoldState extends ConsumerState<_ProfileScaffold>
                 child: Container(
                   margin: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.4),
+                    color: AppColors.inkMid,
                     shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.borderCard,
+                      width: 1.5,
+                    ),
                   ),
                   child: const Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white, size: 18),
+                    Icons.arrow_back_ios_new_rounded,
+                    color: AppColors.textPrimary,
+                    size: 18,
+                  ),
                 ),
               ),
             ),
@@ -113,21 +119,34 @@ class _ProfileScaffoldState extends ConsumerState<_ProfileScaffold>
               const SizedBox(height: 16),
               Text(
                 'Profile not found',
-                style: AppTextStyles.displayMd.copyWith(color: AppColors.textPrimary),
+                style: AppTextStyles.displayMd
+                    .copyWith(color: AppColors.textPrimary),
               ),
             ],
           ),
         ),
         data: (stats) {
           if (stats == null) {
-            return const Center(child: Text('Profile not found', style: TextStyle(color: AppColors.textPrimary)));
+            return Center(
+              child: Text(
+                'Profile not found',
+                style: AppTextStyles.bodyLarge,
+              ),
+            );
           }
           return NestedScrollView(
             headerSliverBuilder: (_, __) => [
+              // Safe area padding for own profile (no AppBar)
+              if (widget.isOwn)
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: MediaQuery.of(context).padding.top + 4,
+                  ),
+                ),
               SliverToBoxAdapter(
                 child: ProfileHeader(
-                  stats:  stats,
-                  isOwn:  widget.isOwn,
+                  stats: stats,
+                  isOwn: widget.isOwn,
                   onLogout: () async {
                     await ref
                         .read(authNotifierProvider.notifier)
@@ -140,11 +159,11 @@ class _ProfileScaffoldState extends ConsumerState<_ProfileScaffold>
                       context.push(AppRoutes.editProfile),
                   onFollowTap: widget.isOwn
                       ? null
-                      : () => ref
-                          .read(followProvider.notifier)
-                          .toggle(),
+                      : () =>
+                          ref.read(followProvider.notifier).toggle(),
                   onAdminTap: widget.isOwn &&
-                          SupabaseService.client.auth.currentUser?.email ==
+                          SupabaseService
+                                  .client.auth.currentUser?.email ==
                               'rekt11.cam@gmail.com'
                       ? () => context.push(AppRoutes.adminRequests)
                       : null,
@@ -154,14 +173,11 @@ class _ProfileScaffoldState extends ConsumerState<_ProfileScaffold>
                 pinned: true,
                 delegate: _PinnedTabBar(TabBar(
                   controller: _tabs,
-                  indicatorColor: AppColors.cream60,
-                  indicatorWeight: 2,
+                  indicatorColor: AppColors.cream100,
+                  indicatorWeight: 3,
                   labelColor: AppColors.textPrimary,
-                  unselectedLabelColor:
-                      AppColors.textSecondary
-                          .withOpacity(0.4),
-                  labelStyle: const TextStyle(
-                      fontSize: 13, fontWeight: FontWeight.w600),
+                  unselectedLabelColor: AppColors.textTertiary,
+                  labelStyle: AppTextStyles.labelLarge,
                   tabs: const [
                     Tab(text: 'Posts'),
                     Tab(text: 'Followers'),
@@ -183,11 +199,21 @@ class _ProfileScaffoldState extends ConsumerState<_ProfileScaffold>
       ),
       bottomNavigationBar: widget.isOwn
           ? EntanglNavBar(
-              currentIndex: 2,
+              currentIndex: 4,
               onTap: (i) {
                 switch (i) {
-                  case 0: context.go(AppRoutes.home); break;
-                  case 1: context.push(AppRoutes.createPost); break;
+                  case 0:
+                    context.go(AppRoutes.home);
+                    break;
+                  case 1:
+                    context.push(AppRoutes.search);
+                    break;
+                  case 2:
+                    context.push(AppRoutes.createPost);
+                    break;
+                  case 3:
+                    context.push(AppRoutes.notifications);
+                    break;
                 }
               },
             )
@@ -258,8 +284,7 @@ class _PostsTab extends ConsumerWidget {
             padding:
                 const EdgeInsets.only(top: 8, bottom: 120),
             itemCount: posts.length,
-            itemBuilder: (_, i) =>
-                PostCard(post: posts[i] as PostModel),
+            itemBuilder: (_, i) => PostCard(post: posts[i]),
           ),
         );
       },

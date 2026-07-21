@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 
+/// Primary CTA — solid yellow with ink outline (Stitch Post button style).
 class GradientButton extends StatefulWidget {
   final String label;
   final VoidCallback? onTap;
@@ -25,7 +26,8 @@ class GradientButton extends StatefulWidget {
   State<GradientButton> createState() => _GradientButtonState();
 }
 
-class _GradientButtonState extends State<GradientButton> with SingleTickerProviderStateMixin {
+class _GradientButtonState extends State<GradientButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   bool _isPressed = false;
 
@@ -49,18 +51,14 @@ class _GradientButtonState extends State<GradientButton> with SingleTickerProvid
 
   void _handleTapDown(TapDownDetails details) {
     if (widget.onTap != null && !widget.isLoading) {
-      setState(() {
-        _isPressed = true;
-      });
+      setState(() => _isPressed = true);
       _controller.animateTo(0.96, curve: Curves.easeOutQuad);
     }
   }
 
   void _handleTapUp(TapUpDetails details) {
     if (widget.onTap != null && !widget.isLoading) {
-      setState(() {
-        _isPressed = false;
-      });
+      setState(() => _isPressed = false);
       _controller.animateTo(1.0, curve: Curves.elasticOut);
       HapticFeedback.lightImpact();
       widget.onTap!();
@@ -69,9 +67,7 @@ class _GradientButtonState extends State<GradientButton> with SingleTickerProvid
 
   void _handleTapCancel() {
     if (widget.onTap != null && !widget.isLoading) {
-      setState(() {
-        _isPressed = false;
-      });
+      setState(() => _isPressed = false);
       _controller.animateTo(1.0, curve: Curves.easeOutQuad);
     }
   }
@@ -80,9 +76,9 @@ class _GradientButtonState extends State<GradientButton> with SingleTickerProvid
   Widget build(BuildContext context) {
     final isDisabled = widget.onTap == null || widget.isLoading;
 
-    Color containerColor;
-    List<BoxShadow>? shadows;
-    Color textColor;
+    final Color containerColor;
+    final Color textColor;
+    final List<BoxShadow>? shadows;
 
     if (isDisabled) {
       containerColor = AppColors.inkWarm;
@@ -95,7 +91,7 @@ class _GradientButtonState extends State<GradientButton> with SingleTickerProvid
     } else {
       containerColor = AppColors.cream100;
       textColor = AppColors.textOnCream;
-      shadows = AppColors.shadowCard;
+      shadows = AppColors.shadowDoodle;
     }
 
     return ScaleTransition(
@@ -108,7 +104,13 @@ class _GradientButtonState extends State<GradientButton> with SingleTickerProvid
           height: widget.height,
           decoration: BoxDecoration(
             color: containerColor,
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDisabled
+                  ? AppColors.borderDefault
+                  : AppColors.borderCard,
+              width: 2,
+            ),
             boxShadow: shadows,
           ),
           child: Row(
@@ -132,7 +134,7 @@ class _GradientButtonState extends State<GradientButton> with SingleTickerProvid
                   widget.label,
                   style: AppTextStyles.labelMedium.copyWith(
                     color: textColor,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               if (widget.trailingIcon != null && !widget.isLoading) ...[

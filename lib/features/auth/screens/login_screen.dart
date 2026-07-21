@@ -163,10 +163,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       color: AppColors.inkMid,
                       borderRadius: BorderRadius.circular(28),
                       border: Border.all(
-                        color: AppColors.borderSubtle,
-                        width: 0.5,
+                        color: AppColors.borderCard,
+                        width: 2,
                       ),
-                      boxShadow: AppColors.shadowFloat,
+                      boxShadow: AppColors.shadowDoodle,
                     ),
                     child: Form(
                       key: _formKey,
@@ -178,8 +178,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             child: Text(
                               'Welcome back',
                               style: AppTextStyles.displayXl.copyWith(
-                                color: AppColors.cream100,
-                                fontSize: 32,
+                                color: AppColors.textPrimary,
+                                fontSize: 30,
                                 height: 1.1,
                               ),
                             ),
@@ -188,7 +188,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           Text(
                             'Sign in to continue',
                             style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.textTertiary,
+                              color: AppColors.textSecondary,
                             ),
                           ),
                           const SizedBox(height: 32),
@@ -232,8 +232,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               child: Text(
                                 'Forgot Password?',
                                 style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.cream100,
-                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.w700,
+                                  decoration: TextDecoration.underline,
                                 ),
                               ),
                             ),
@@ -245,7 +246,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               Text(
                                 "Don't have an account? ",
                                 style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.textTertiary,
+                                  color: AppColors.textSecondary,
                                 ),
                               ),
                               GestureDetector(
@@ -253,8 +254,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 child: Text(
                                   'Sign up',
                                   style: AppTextStyles.bodyMedium.copyWith(
-                                    color: AppColors.cream100,
-                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                    fontWeight: FontWeight.w800,
+                                    decoration: TextDecoration.underline,
                                   ),
                                 ),
                               ),

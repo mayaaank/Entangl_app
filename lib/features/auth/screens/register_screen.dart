@@ -165,10 +165,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       color: AppColors.inkMid,
                       borderRadius: BorderRadius.circular(28),
                       border: Border.all(
-                        color: AppColors.borderSubtle,
-                        width: 0.5,
+                        color: AppColors.borderCard,
+                        width: 2,
                       ),
-                      boxShadow: AppColors.shadowFloat,
+                      boxShadow: AppColors.shadowDoodle,
                     ),
                     child: Form(
                       key: _formKey,
@@ -180,8 +180,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             child: Text(
                               'Create Account',
                               style: AppTextStyles.displayXl.copyWith(
-                                color: AppColors.cream100,
-                                fontSize: 32,
+                                color: AppColors.textPrimary,
+                                fontSize: 30,
                                 height: 1.1,
                               ),
                             ),
@@ -190,7 +190,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                            Text(
                             'Join Entangl today',
                             style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.textTertiary,
+                              color: AppColors.textSecondary,
                             ),
                           ),
                           const SizedBox(height: 32),
@@ -266,7 +266,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               Text(
                                 'Already have an account? ',
                                 style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.textTertiary,
+                                  color: AppColors.textSecondary,
                                 ),
                               ),
                               GestureDetector(
@@ -274,8 +274,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 child: Text(
                                   'Sign in',
                                   style: AppTextStyles.bodyMedium.copyWith(
-                                    color: AppColors.cream100,
-                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                    fontWeight: FontWeight.w800,
+                                    decoration: TextDecoration.underline,
                                   ),
                                 ),
                               ),

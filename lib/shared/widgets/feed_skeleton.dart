@@ -27,19 +27,20 @@ class _SkeletonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
       decoration: BoxDecoration(
         color: AppColors.paperSage,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.borderSubtle, width: 0.5),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.borderCard, width: 2),
+        boxShadow: AppColors.shadowDoodle,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              _bone(circle: true, size: 42),
+              _bone(circle: true, size: 38),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -60,22 +61,25 @@ class _SkeletonCard extends StatelessWidget {
           const SizedBox(height: 8),
           _bone(width: 160, height: 12),
           const SizedBox(height: 16),
-          _bone(width: double.infinity, height: 160, radius: 16),
+          _bone(width: double.infinity, height: 140, radius: 16),
           const SizedBox(height: 14),
           Row(
             children: [
-              _bone(width: 52, height: 28, radius: 100),
+              Expanded(child: _bone(height: 48, radius: 14)),
               const SizedBox(width: 8),
-              _bone(width: 52, height: 28, radius: 100),
+              Expanded(child: _bone(height: 48, radius: 14)),
               const SizedBox(width: 8),
-              _bone(width: 52, height: 28, radius: 100),
+              Expanded(child: _bone(height: 48, radius: 14)),
+              const SizedBox(width: 8),
+              Expanded(child: _bone(height: 48, radius: 14)),
             ],
           ),
         ],
       ),
     )
         .animate(onPlay: (c) => c.repeat())
-        .shimmer(duration: 1400.ms, color: AppColors.inkMid.withOpacity(0.35));
+        .shimmer(
+            duration: 1400.ms, color: AppColors.paperWarm.withOpacity(0.7));
   }
 
   Widget _bone({
@@ -97,7 +101,7 @@ class _SkeletonCard extends StatelessWidget {
   }
 }
 
-/// Compact profile header skeleton.
+/// Compact profile header skeleton (centered, Stitch-style).
 class ProfileSkeleton extends StatelessWidget {
   const ProfileSkeleton({super.key});
 
@@ -105,56 +109,67 @@ class ProfileSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(height: 140, color: AppColors.inkWarm)
-            .animate(onPlay: (c) => c.repeat())
-            .shimmer(duration: 1400.ms, color: AppColors.inkMid.withOpacity(0.35)),
+        SizedBox(height: MediaQuery.of(context).padding.top + 24),
+        Container(
+          width: 104,
+          height: 104,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.inkWarm,
+            border: Border.all(color: AppColors.borderCard, width: 2),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          width: 160,
+          height: 18,
+          decoration: BoxDecoration(
+            color: AppColors.inkWarm,
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          width: 100,
+          height: 12,
+          decoration: BoxDecoration(
+            color: AppColors.inkWarm,
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        const SizedBox(height: 20),
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Container(
+            height: 64,
+            decoration: BoxDecoration(
+              color: AppColors.inkWarm,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.borderDefault, width: 1.5),
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
             children: [
-              Transform.translate(
-                offset: const Offset(0, -28),
+              Expanded(
                 child: Container(
-                  width: 72,
-                  height: 72,
+                  height: 48,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
                     color: AppColors.inkWarm,
-                    border: Border.all(color: AppColors.inkBase, width: 3),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                 ),
               ),
-              Container(
-                width: 160,
-                height: 18,
-                decoration: BoxDecoration(
-                  color: AppColors.inkWarm,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Container(
-                width: 100,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: AppColors.inkWarm,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: List.generate(
-                  3,
-                  (_) => Expanded(
-                    child: Container(
-                      height: 48,
-                      margin: const EdgeInsets.only(right: 8),
-                      decoration: BoxDecoration(
-                        color: AppColors.inkWarm,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Container(
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppColors.inkWarm,
+                    borderRadius: BorderRadius.circular(14),
                   ),
                 ),
               ),
@@ -164,6 +179,7 @@ class ProfileSkeleton extends StatelessWidget {
       ],
     )
         .animate(onPlay: (c) => c.repeat())
-        .shimmer(duration: 1400.ms, color: AppColors.inkMid.withOpacity(0.35));
+        .shimmer(
+            duration: 1400.ms, color: AppColors.paperWarm.withOpacity(0.7));
   }
 }

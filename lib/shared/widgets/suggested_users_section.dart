@@ -104,7 +104,8 @@ class _SuggestCardState extends ConsumerState<_SuggestCard> {
       decoration: BoxDecoration(
         color: AppColors.paperSage,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderSubtle, width: 0.5),
+        border: Border.all(color: AppColors.borderCard, width: 2),
+        boxShadow: AppColors.shadowDoodle,
       ),
       child: Column(
         children: [
@@ -132,7 +133,7 @@ class _SuggestCardState extends ConsumerState<_SuggestCard> {
               fontSize: 11,
             ),
           ),
-          const Spacer(),
+          const SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
             height: 34,

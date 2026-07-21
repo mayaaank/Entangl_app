@@ -17,29 +17,35 @@ class SettingsScreen extends ConsumerWidget {
     final notifN = ref.read(notificationSettingsProvider.notifier);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundDark,
+      backgroundColor: AppColors.inkBase,
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundDark,
+        backgroundColor: AppColors.inkBase,
         leading: IconButton(
           onPressed: () => context.pop(),
           icon: const Icon(Icons.arrow_back_ios_new,
-              color: AppColors.onSurfaceDark, size: 20),
+              color: AppColors.textPrimary, size: 20),
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Settings',
-                style: AppTextStyles.pageTitle
-                    .copyWith(color: AppColors.onSurfaceDark)),
+            Text(
+              'Settings',
+              style: AppTextStyles.pageTitle.copyWith(
+                color: AppColors.textPrimary,
+                fontSize: 32,
+              ),
+            ),
             const SizedBox(height: 4),
-            Text('Control your digital footprint',
-                style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.onSurfaceVariantDark,
-                    letterSpacing: 1.1)),
-            const SizedBox(height: 36),
+            Text(
+              'Tune your entangl experience',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 28),
 
             // ── Notifications ─────────────────────────────
             SettingsSection(label: 'Notifications', rows: [

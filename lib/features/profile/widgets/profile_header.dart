@@ -4,10 +4,10 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../data/models/profile_stats_model.dart';
 import '../../../shared/widgets/avatar_widget.dart';
-import '../../../shared/widgets/mascot_widgets.dart';
-import '../../../shared/widgets/doodle_widget.dart';
 import '../providers/profile_provider.dart';
 
+/// Centered profile header matching Stitch user_profile.png:
+/// large outlined avatar, name/handle, bio, stats strip, dual CTAs.
 class ProfileHeader extends ConsumerWidget {
   final ProfileStatsModel stats;
   final bool isOwn;
@@ -28,205 +28,171 @@ class ProfileHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Read follow state from local provider — instant, no DB wait
     final followState = ref.watch(followProvider);
     final isFollowing = isOwn ? false : followState.isFollowing;
-
-    // Apply local delta to follower count so it updates instantly
-    final displayedFollowers = stats.followerCount + (isOwn ? 0 : followState.followerDelta);
-
-    // Unique hero tag per user so multiple avatars on screen
-    // don't conflict with each other
+    final displayedFollowers =
+        stats.followerCount + (isOwn ? 0 : followState.followerDelta);
     final avatarHeroTag = 'avatar_${stats.user.id}';
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // ── Banner ───────────────────────────────────────
-        Stack(
-          children: [
-            Container(
-              height: 140,
-              color: AppColors.inkWarm,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+      child: Column(
+        children: [
+          // Brand chip
+          Text(
+            'entangl',
+            style: AppTextStyles.brandWordmark.copyWith(fontSize: 18),
+          ),
+          const SizedBox(height: 16),
+
+          // Avatar with thick ink ring
+          Container(
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.borderCard, width: 2.5),
+              boxShadow: AppColors.shadowDoodle,
             ),
-            // Floating Doodle in corner of banner
-            const Positioned(
-              top: 16,
-              right: 16,
-              child: DoodleWidget(
-                type: DoodleType.sparkle,
-                size: 32,
-                opacity: 0.25,
-              ),
+            child: AvatarWidget(
+              imageUrl: stats.user.avatarUrl,
+              size: 104,
+              heroTag: avatarHeroTag,
             ),
-            const Positioned(
-              top: 40,
-              left: 20,
-              child: DoodleWidget(
-                type: DoodleType.star,
-                size: 20,
-                opacity: 0.15,
+          ),
+          const SizedBox(height: 14),
+
+          Text(
+            stats.user.fullName,
+            style: AppTextStyles.title1.copyWith(fontSize: 24),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            '@${stats.user.username}',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+
+          if (stats.user.bio?.isNotEmpty == true) ...[
+            const SizedBox(height: 12),
+            Text(
+              stats.user.bio!,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+                height: 1.45,
               ),
             ),
           ],
-        ),
 
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Avatar row ─────────────────────────────
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Transform.translate(
-                    offset: const Offset(0, -28),
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 10,
-                            offset: Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border(
-                                top: BorderSide(color: AppColors.inkBase, width: 3.5),
-                                bottom: BorderSide(color: AppColors.inkBase, width: 3.5),
-                                left: BorderSide(color: AppColors.inkBase, width: 3.5),
-                                right: BorderSide(color: AppColors.inkBase, width: 3.5),
-                              ),
-                            ),
-                            child: AvatarWidget(
-                              imageUrl: stats.user.avatarUrl,
-                              size: 72,
-                              heroTag: avatarHeroTag,
-                            ),
-                          ),
-                          // Mascot badge stacked on avatar
-                          Positioned(
-                            bottom: -2,
-                            right: -2,
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: const BoxDecoration(
-                                color: AppColors.inkBase,
-                                shape: BoxShape.circle,
-                              ),
-                              child: isOwn
-                                  ? const GhostMascot(
-                                      expression: GhostExpression.waving,
-                                      size: 24,
-                                      animate: true,
-                                    )
-                                  : const FrogMascot(
-                                      expression: FrogExpression.happy,
-                                      size: 24,
-                                      animate: true,
-                                    ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+          const SizedBox(height: 18),
+
+          // Stats strip
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            decoration: BoxDecoration(
+              color: AppColors.inkMid,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.borderCard, width: 2),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _Stat(label: 'Posts', value: stats.postCount),
+                ),
+                Container(width: 1.5, height: 36, color: AppColors.borderDefault),
+                Expanded(
+                  child: _Stat(
+                    label: 'Followers',
+                    value: displayedFollowers.clamp(0, 999999999),
                   ),
-                  const Spacer(),
-                  if (isOwn) ...[
-                    if (onAdminTap != null) ...[
-                      _OutlineButton(
-                        label: 'Admin',
-                        onTap:  onAdminTap!,
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                    _OutlineButton(
-                      label: 'Edit profile',
-                      onTap: onEditProfile,
-                    ),
-                    const SizedBox(width: 8),
-                    _OutlineButton(
-                      label: 'Log out',
-                      onTap: onLogout,
-                      isDestructive: true,
-                    ),
-                  ] else
-                    _FollowButton(
-                      isFollowing: isFollowing,
-                      onTap: onFollowTap,
-                    ),
-                ],
-              ),
-              const SizedBox(height: 4),
-
-              // ── Name + username ────────────────────────
-              Text(
-                stats.user.fullName,
-                style: AppTextStyles.sectionTitle.copyWith(
-                  color: AppColors.textPrimary,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
                 ),
-              ),
-              Text(
-                '@${stats.user.username}',
-                style: AppTextStyles.username.copyWith(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-
-              if (stats.user.bio?.isNotEmpty == true) ...[
-                const SizedBox(height: 12),
-                Text(
-                  stats.user.bio!,
-                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                Container(width: 1.5, height: 36, color: AppColors.borderDefault),
+                Expanded(
+                  child: _Stat(label: 'Following', value: stats.followingCount),
                 ),
               ],
-
-              const SizedBox(height: 20),
-
-              // ── Stats row (Paper Card) ────────────────
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                decoration: BoxDecoration(
-                  color: AppColors.paperSage,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.borderSubtle,
-                    width: 0.5,
-                  ),
-                  boxShadow: AppColors.shadowCard,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _Stat(label: 'Posts',     value: stats.postCount),
-                    _Stat(
-                      label: 'Followers',
-                      value: displayedFollowers.clamp(0, 999999999),
-                    ),
-                    _Stat(label: 'Following', value: stats.followingCount),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ],
+
+          const SizedBox(height: 14),
+
+          // Action row
+          if (isOwn)
+            Row(
+              children: [
+                if (onAdminTap != null) ...[
+                  Expanded(
+                    child: _DoodleButton(
+                      label: 'Admin',
+                      fill: AppColors.pastelLavender,
+                      onTap: onAdminTap!,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                ],
+                Expanded(
+                  child: _DoodleButton(
+                    label: 'Edit profile',
+                    fill: AppColors.cream60,
+                    onTap: onEditProfile,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _DoodleButton(
+                    label: 'Log out',
+                    fill: AppColors.pastelPink.withOpacity(0.55),
+                    onTap: onLogout,
+                    isDestructive: true,
+                  ),
+                ),
+              ],
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: _FollowButton(
+                    isFollowing: isFollowing,
+                    onTap: onFollowTap,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _DoodleButton(
+                    label: 'Message',
+                    fill: AppColors.pastelBlue,
+                    onTap: () {
+                      // Messaging not yet wired — soft no-op toast.
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Messaging coming soon',
+                            style: AppTextStyles.bodyMedium
+                                .copyWith(color: AppColors.textOnDark),
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    },
+                    trailing: const Icon(
+                      Icons.mail_outline_rounded,
+                      size: 18,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
     );
   }
 }
 
-// ── Follow button — animated, reads local state ───────────────
 class _FollowButton extends ConsumerStatefulWidget {
   final bool isFollowing;
   final VoidCallback? onTap;
@@ -248,32 +214,34 @@ class _FollowButtonState extends ConsumerState<_FollowButton> {
       onTapCancel: () => setState(() => _isTapped = false),
       onTap: widget.onTap,
       child: AnimatedScale(
-        scale: _isTapped ? 0.95 : 1.0,
+        scale: _isTapped ? 0.96 : 1.0,
         duration: const Duration(milliseconds: 100),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+          height: 48,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: widget.isFollowing ? AppColors.inkWarm : AppColors.cream100,
-            border: Border.all(
-              color: widget.isFollowing ? AppColors.borderSubtle : Colors.transparent,
-              width: 0.5,
-            ),
-            borderRadius: BorderRadius.circular(100),
-            boxShadow: widget.isFollowing ? null : AppColors.shadowCard,
+            color: widget.isFollowing ? AppColors.cream60 : AppColors.cream100,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.borderCard, width: 2),
+            boxShadow: AppColors.shadowDoodle,
           ),
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 150),
-            child: Text(
-              widget.isFollowing ? 'Following' : 'Follow',
-              key: ValueKey(widget.isFollowing),
-              style: TextStyle(
-                color: widget.isFollowing ? AppColors.textPrimary : AppColors.textOnCream,
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                widget.isFollowing ? 'Following' : 'Follow',
+                style: AppTextStyles.labelLarge.copyWith(
+                  color: AppColors.textOnCream,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
-            ),
+              if (widget.isFollowing) ...[
+                const SizedBox(width: 6),
+                const Icon(Icons.check_rounded,
+                    size: 18, color: AppColors.textOnCream),
+              ],
+            ],
           ),
         ),
       ),
@@ -281,22 +249,26 @@ class _FollowButtonState extends ConsumerState<_FollowButton> {
   }
 }
 
-class _OutlineButton extends StatefulWidget {
+class _DoodleButton extends StatefulWidget {
   final String label;
+  final Color fill;
   final VoidCallback onTap;
   final bool isDestructive;
+  final Widget? trailing;
 
-  const _OutlineButton({
+  const _DoodleButton({
     required this.label,
+    required this.fill,
     required this.onTap,
     this.isDestructive = false,
+    this.trailing,
   });
 
   @override
-  State<_OutlineButton> createState() => _OutlineButtonState();
+  State<_DoodleButton> createState() => _DoodleButtonState();
 }
 
-class _OutlineButtonState extends State<_OutlineButton> {
+class _DoodleButtonState extends State<_DoodleButton> {
   bool _isTapped = false;
 
   @override
@@ -307,25 +279,33 @@ class _OutlineButtonState extends State<_OutlineButton> {
       onTapCancel: () => setState(() => _isTapped = false),
       onTap: widget.onTap,
       child: AnimatedScale(
-        scale: _isTapped ? 0.94 : 1.0,
+        scale: _isTapped ? 0.96 : 1.0,
         duration: const Duration(milliseconds: 100),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          height: 48,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: widget.isDestructive ? AppColors.dislike.withOpacity(0.08) : AppColors.inkWarm,
-            border: Border.all(
-              color: widget.isDestructive ? AppColors.dislike.withOpacity(0.4) : AppColors.borderSubtle,
-              width: 0.5,
-            ),
-            borderRadius: BorderRadius.circular(100),
+            color: widget.fill,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.borderCard, width: 2),
           ),
-          child: Text(
-            widget.label,
-            style: TextStyle(
-              color: widget.isDestructive ? AppColors.dislike : AppColors.textPrimary,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                widget.label,
+                style: AppTextStyles.labelLarge.copyWith(
+                  color: widget.isDestructive
+                      ? AppColors.dislike
+                      : AppColors.textPrimary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              if (widget.trailing != null) ...[
+                const SizedBox(width: 6),
+                widget.trailing!,
+              ],
+            ],
           ),
         ),
       ),
@@ -340,22 +320,20 @@ class _Stat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final display = value >= 1000 ? '${(value / 1000).toStringAsFixed(1)}k' : '$value';
+    final display =
+        value >= 1000 ? '${(value / 1000).toStringAsFixed(1)}K' : '$value';
     return Column(
       children: [
         Text(
           display,
-          style: AppTextStyles.statNumber.copyWith(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.w800,
-          ),
+          style: AppTextStyles.statNumber,
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Text(
-          label.toUpperCase(),
+          label,
           style: AppTextStyles.statLabel.copyWith(
             color: AppColors.textTertiary,
-            letterSpacing: 1.0,
+            letterSpacing: 0.2,
           ),
         ),
       ],

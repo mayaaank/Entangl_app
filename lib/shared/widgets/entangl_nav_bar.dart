@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:ui';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/theme/app_colors.dart';
-import 'mascot_widgets.dart';
 
+/// Floating pill nav matching Stitch home feed:
+/// Home · Search · Create(+) · Notifications · Profile
 class EntanglNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
-  /// Optional long-press on the center Create button (e.g. Post vs Story sheet).
   final VoidCallback? onCreateLongPress;
 
+  /// Index map: 0=home, 1=search, 2=create, 3=notifications, 4=profile
   const EntanglNavBar({
     super.key,
     required this.currentIndex,
@@ -22,68 +21,52 @@ class EntanglNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).padding.bottom + 16,
-        left: 20,
-        right: 20,
+        bottom: MediaQuery.of(context).padding.bottom + 12,
+        left: 16,
+        right: 16,
       ),
-      child: SizedBox(
+      child: Container(
         height: 64,
-        child: Stack(
-          clipBehavior: Clip.none,
+        decoration: BoxDecoration(
+          color: AppColors.inkMid,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: AppColors.borderCard, width: 2),
+          boxShadow: AppColors.shadowFloat,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            // Background warm ink card
-            Positioned.fill(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.inkMid.withOpacity(0.85),
-                      borderRadius: BorderRadius.circular(999),
-                      border: Border.all(
-                        color: AppColors.borderSubtle,
-                        width: 0.5,
-                      ),
-                      boxShadow: AppColors.shadowFloat,
-                    ),
-                  ),
-                ),
-              ),
+            _NavIcon(
+              icon: Icons.home_outlined,
+              activeIcon: Icons.home_rounded,
+              label: 'Home',
+              isActive: currentIndex == 0,
+              onTap: () => onTap(0),
             ),
-            // Navigation row
-            Positioned.fill(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _NavItem(
-                    icon: Icons.home_outlined,
-                    activeIcon: Icons.home_rounded,
-                    label: 'Home',
-                    isActive: currentIndex == 0,
-                    onTap: () => onTap(0),
-                    activeCharacter: const GhostMascot(
-                      expression: GhostExpression.dancing,
-                      size: 20,
-                    ),
-                  ),
-                  _CreateButton(
-                    onTap: () => onTap(1),
-                    onLongPress: onCreateLongPress,
-                  ),
-                  _NavItem(
-                    icon: Icons.person_outline_rounded,
-                    activeIcon: Icons.person_rounded,
-                    label: 'Profile',
-                    isActive: currentIndex == 2,
-                    onTap: () => onTap(2),
-                    activeCharacter: const FrogMascot(
-                      expression: FrogExpression.sitting,
-                      size: 20,
-                    ),
-                  ),
-                ],
-              ),
+            _NavIcon(
+              icon: Icons.search_rounded,
+              activeIcon: Icons.search_rounded,
+              label: 'Search',
+              isActive: currentIndex == 1,
+              onTap: () => onTap(1),
+            ),
+            _CreateButton(
+              onTap: () => onTap(2),
+              onLongPress: onCreateLongPress,
+            ),
+            _NavIcon(
+              icon: Icons.notifications_outlined,
+              activeIcon: Icons.notifications_rounded,
+              label: 'Notifications',
+              isActive: currentIndex == 3,
+              onTap: () => onTap(3),
+            ),
+            _NavIcon(
+              icon: Icons.person_outline_rounded,
+              activeIcon: Icons.person_rounded,
+              label: 'Profile',
+              isActive: currentIndex == 4,
+              onTap: () => onTap(4),
             ),
           ],
         ),
@@ -92,87 +75,47 @@ class EntanglNavBar extends StatelessWidget {
   }
 }
 
-class _NavItem extends StatelessWidget {
+class _NavIcon extends StatelessWidget {
   final IconData icon;
   final IconData activeIcon;
   final String label;
   final bool isActive;
   final VoidCallback onTap;
-  final Widget activeCharacter;
 
-  const _NavItem({
+  const _NavIcon({
     required this.icon,
     required this.activeIcon,
     required this.label,
     required this.isActive,
     required this.onTap,
-    required this.activeCharacter,
   });
 
   @override
   Widget build(BuildContext context) {
-    final reduceMotion = MediaQuery.of(context).disableAnimations;
     return Semantics(
       button: true,
       label: label,
       selected: isActive,
       child: Tooltip(
         message: label,
-        child: GestureDetector(
-          onTap: onTap,
-          behavior: HitTestBehavior.opaque,
-          child: SizedBox(
-            width: 72,
-            height: 64,
-            child: Stack(
-              alignment: Alignment.center,
-              clipBehavior: Clip.none,
-              children: [
-                if (isActive)
-                  Positioned(
-                    top: -24,
-                    child: reduceMotion
-                        ? activeCharacter
-                        : activeCharacter
-                            .animate()
-                            .scale(
-                              begin: const Offset(0.3, 0.3),
-                              end: const Offset(1.0, 1.0),
-                              duration: 300.ms,
-                              curve: Curves.elasticOut,
-                            )
-                            .moveY(
-                                begin: 12,
-                                end: 0,
-                                duration: 300.ms,
-                                curve: Curves.easeOutBack),
-                  ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 12),
-                    Icon(
-                      isActive ? activeIcon : icon,
-                      key: ValueKey(isActive),
-                      color: isActive
-                          ? AppColors.cream100
-                          : AppColors.textTertiary,
-                      size: 24,
-                    ),
-                    const SizedBox(height: 4),
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.easeOutBack,
-                      width: isActive ? 6 : 0,
-                      height: isActive ? 6 : 0,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.cream60,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              onTap();
+            },
+            customBorder: const CircleBorder(),
+            child: SizedBox(
+              width: 48,
+              height: 48,
+              child: Icon(
+                isActive ? activeIcon : icon,
+                color: isActive
+                    ? AppColors.textPrimary
+                    : AppColors.textTertiary,
+                size: 26,
+              ),
             ),
           ),
         ),
@@ -190,7 +133,8 @@ class _CreateButton extends StatefulWidget {
   State<_CreateButton> createState() => _CreateButtonState();
 }
 
-class _CreateButtonState extends State<_CreateButton> with SingleTickerProviderStateMixin {
+class _CreateButtonState extends State<_CreateButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -211,28 +155,20 @@ class _CreateButtonState extends State<_CreateButton> with SingleTickerProviderS
     super.dispose();
   }
 
-  void _handleTapDown(TapDownDetails details) {
-    _controller.animateTo(0.92, curve: Curves.easeOutQuad);
-  }
-
-  void _handleTapUp(TapUpDetails details) {
-    _controller.animateTo(1.0, curve: Curves.elasticOut);
-    HapticFeedback.mediumImpact();
-    widget.onTap();
-  }
-
-  void _handleTapCancel() {
-    _controller.animateTo(1.0, curve: Curves.easeOutQuad);
-  }
-
   @override
   Widget build(BuildContext context) {
     return ScaleTransition(
       scale: _controller,
       child: GestureDetector(
-        onTapDown: _handleTapDown,
-        onTapUp: _handleTapUp,
-        onTapCancel: _handleTapCancel,
+        onTapDown: (_) =>
+            _controller.animateTo(0.92, curve: Curves.easeOutQuad),
+        onTapUp: (_) {
+          _controller.animateTo(1.0, curve: Curves.elasticOut);
+          HapticFeedback.mediumImpact();
+          widget.onTap();
+        },
+        onTapCancel: () =>
+            _controller.animateTo(1.0, curve: Curves.easeOutQuad),
         onLongPress: widget.onLongPress == null
             ? null
             : () {
@@ -245,13 +181,13 @@ class _CreateButtonState extends State<_CreateButton> with SingleTickerProviderS
           child: Tooltip(
             message: 'Create',
             child: Container(
-              width: 56,
-              height: 56,
-              margin: const EdgeInsets.only(bottom: 12),
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
                 color: AppColors.cream100,
                 shape: BoxShape.circle,
-                boxShadow: AppColors.shadowFloat,
+                border: Border.all(color: AppColors.borderCard, width: 2),
+                boxShadow: AppColors.shadowDoodle,
               ),
               child: const Icon(
                 Icons.add_rounded,

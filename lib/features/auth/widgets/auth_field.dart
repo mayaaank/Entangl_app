@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 
-/// Reusable labelled text field for auth screens.
-/// Pure UI — no providers, no logic.
+/// Labelled text field for auth — paper doodle styling.
 class AuthField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
@@ -32,8 +31,9 @@ class AuthField extends StatelessWidget {
         Text(
           label.toUpperCase(),
           style: AppTextStyles.labelSmall.copyWith(
-            color: AppColors.onSurfaceVariantDark,
-            letterSpacing: 1.2,
+            color: AppColors.textSecondary,
+            letterSpacing: 1.1,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 8),
@@ -41,10 +41,56 @@ class AuthField extends StatelessWidget {
           controller: controller,
           keyboardType: type,
           obscureText: obscure,
-          style: AppTextStyles.bodyMedium
-              .copyWith(color: AppColors.onSurfaceDark),
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
           decoration: InputDecoration(
             hintText: hint,
+            filled: true,
+            fillColor: AppColors.paperAsh,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: 16,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(
+                color: AppColors.borderCard,
+                width: 1.5,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(
+                color: AppColors.borderDefault,
+                width: 1.5,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(
+                color: AppColors.borderCard,
+                width: 2,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(
+                color: AppColors.dislike,
+                width: 1.5,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(
+                color: AppColors.dislike,
+                width: 2,
+              ),
+            ),
+            hintStyle: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textMuted,
+            ),
             suffixIcon: onToggleObscure != null
                 ? IconButton(
                     onPressed: onToggleObscure,
@@ -52,7 +98,7 @@ class AuthField extends StatelessWidget {
                       obscure
                           ? Icons.visibility_off_outlined
                           : Icons.visibility_outlined,
-                      color: AppColors.outline,
+                      color: AppColors.textTertiary,
                       size: 20,
                     ),
                   )

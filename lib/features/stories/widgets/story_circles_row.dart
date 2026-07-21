@@ -152,31 +152,31 @@ class _AddStoryCircle extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
-        width: 70,
+        width: 72,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 56,
-              height: 56,
+              width: 60,
+              height: 60,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.inkWarm,
-                border: Border.all(color: AppColors.cream100, width: 1.5),
+                color: AppColors.inkMid,
+                border: Border.all(color: AppColors.borderCard, width: 2),
               ),
               child: const Icon(
-                Icons.add_rounded,
-                color: AppColors.cream100,
+                Icons.person_outline_rounded,
+                color: AppColors.textSecondary,
                 size: 28,
               ),
             ),
-            const SizedBox(height: 5),
-            const Text(
+            const SizedBox(height: 6),
+            Text(
               'Your story',
               style: TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 11,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -210,11 +210,16 @@ class _StoryCircleState extends State<_StoryCircle> {
   @override
   Widget build(BuildContext context) {
     final isOwn = widget.userStory.user.id == SupabaseService.currentUserId;
-    final viewed = widget.userStory.allViewed || widget.userStory.stories.isEmpty;
+    final viewed =
+        widget.userStory.allViewed || widget.userStory.stories.isEmpty;
     final name = isOwn
         ? 'Your story'
         : widget.userStory.user.fullName.split(' ').first;
     final reduceMotion = MediaQuery.of(context).disableAnimations;
+    // Stable pastel index from user id hash
+    final pastel = AppColors.storyRingPastels[
+        widget.userStory.user.id.hashCode.abs() %
+            AppColors.storyRingPastels.length];
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isTapped = true),
@@ -226,7 +231,7 @@ class _StoryCircleState extends State<_StoryCircle> {
         duration: const Duration(milliseconds: 150),
         curve: Curves.easeOutCubic,
         child: SizedBox(
-          width: 70,
+          width: 72,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -236,63 +241,66 @@ class _StoryCircleState extends State<_StoryCircle> {
                   WidgetBorderRing(
                     viewed: viewed,
                     animate: !reduceMotion && !viewed,
+                    accent: isOwn ? AppColors.borderCard : pastel,
                   ),
                   Container(
-                    width: 57,
-                    height: 57,
+                    width: 54,
+                    height: 54,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.inkBase,
+                      color: AppColors.inkMid,
                     ),
                   ),
-                  AvatarWidget(
-                    imageUrl: widget.userStory.user.avatarUrl,
-                    size: 52,
-                    onTap: widget.onTap,
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.inkMid,
+                        width: 2,
+                      ),
+                    ),
+                    child: AvatarWidget(
+                      imageUrl: widget.userStory.user.avatarUrl,
+                      size: 50,
+                      onTap: widget.onTap,
+                    ),
                   ),
                   if (isOwn)
                     Positioned(
                       bottom: 0,
-                      right: 2,
+                      right: 0,
                       child: GestureDetector(
                         onTap: widget.onAddTap ?? widget.onTap,
                         child: Container(
-                          width: 20,
-                          height: 20,
+                          width: 22,
+                          height: 22,
                           decoration: BoxDecoration(
                             color: AppColors.cream100,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: AppColors.inkBase,
+                              color: AppColors.borderCard,
                               width: 1.5,
                             ),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black38,
-                                blurRadius: 4,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
                           ),
                           child: const Icon(
                             Icons.add_rounded,
                             color: AppColors.textOnCream,
-                            size: 13,
+                            size: 14,
                           ),
                         ),
                       ),
                     ),
                 ],
               ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 6),
               Text(
                 name,
                 style: TextStyle(
                   color: viewed
-                      ? AppColors.textSecondary.withOpacity(0.7)
+                      ? AppColors.textTertiary
                       : AppColors.textPrimary,
                   fontSize: 11,
-                  fontWeight: viewed ? FontWeight.w400 : FontWeight.w600,
+                  fontWeight: viewed ? FontWeight.w500 : FontWeight.w700,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -309,23 +317,25 @@ class _StoryCircleState extends State<_StoryCircle> {
 class WidgetBorderRing extends StatelessWidget {
   final bool viewed;
   final bool animate;
+  final Color accent;
   const WidgetBorderRing({
     super.key,
     required this.viewed,
     this.animate = true,
+    this.accent = AppColors.cream100,
   });
 
   @override
   Widget build(BuildContext context) {
     final ring = Container(
-      width: 62,
-      height: 62,
+      width: 64,
+      height: 64,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: viewed ? Colors.transparent : AppColors.cream100,
-        border: viewed
-            ? Border.all(color: AppColors.borderSubtle, width: 1.5)
-            : null,
+        border: Border.all(
+          color: viewed ? AppColors.borderDefault : accent,
+          width: viewed ? 1.5 : 3,
+        ),
         boxShadow: viewed ? null : AppColors.haloStory,
       ),
     );
@@ -368,7 +378,7 @@ class _SkeletonRow extends StatelessWidget {
                   ),
                 )
                     .animate(onPlay: (c) => c.repeat())
-                    .shimmer(duration: 1500.ms, color: AppColors.inkMid),
+                    .shimmer(duration: 1500.ms, color: AppColors.paperWarm),
                 const SizedBox(height: 6),
                 Container(
                   width: 38,
@@ -379,7 +389,7 @@ class _SkeletonRow extends StatelessWidget {
                   ),
                 )
                     .animate(onPlay: (c) => c.repeat())
-                    .shimmer(duration: 1500.ms, color: AppColors.inkMid),
+                    .shimmer(duration: 1500.ms, color: AppColors.paperWarm),
               ],
             ),
           );

@@ -1,115 +1,170 @@
 import 'package:flutter/material.dart';
 
+/// Entangl design tokens — Stitch "paper doodle" system (project 730203883861208133).
+///
+/// Visual language: warm cream paper, white cards with ink outlines,
+/// soft pastel action chips, playful rounded geometry.
 class AppColors {
   AppColors._();
 
-  // ── Ink Background Layers ─────────────────────────────────────────
-  // Named "ink" not "surface" — these are warm, like paper soaked in ink
-  static const Color inkDeep    = Color(0xFF0E0D0B); // Story viewer, immersive overlay
-  static const Color inkBase    = Color(0xFF141210); // Main scaffold background
-  static const Color inkMid     = Color(0xFF1C1A17); // Sheets, modals, nav bar
-  static const Color inkWarm    = Color(0xFF2C2920); // Pressed/active state on tappable rows
+  // ── Paper Background Layers ───────────────────────────────────────
+  // Named "ink*" for historical API stability; values are light paper.
+  static const Color inkDeep = Color(0xFF1A1610); // Immersive overlays (story viewer)
+  static const Color inkBase = Color(0xFFFDF8F0); // Main scaffold — cream paper
+  static const Color inkMid = Color(0xFFFFFFFF); // Sheets, modals, cards
+  static const Color inkWarm = Color(0xFFF3EBE0); // Pressed / muted surface
 
-  // ── Paper Card Surfaces ───────────────────────────────────────────
-  // Each surface has a distinct warm tint — not the same grey at different opacities
-  static const Color paperSage  = Color(0xFF2E3328); // Post cards — muted olive
-  static const Color paperClay  = Color(0xFF352D24); // Notification tiles — terracotta-brown
-  static const Color paperAsh   = Color(0xFF28261F); // Input fields — neutral warm grey
-  static const Color paperWarm  = Color(0xFF3A3328); // Selected / active state on cards
+  // ── Card Surfaces ─────────────────────────────────────────────────
+  static const Color paperSage = Color(0xFFFFFFFF); // Post cards — pure white
+  static const Color paperClay = Color(0xFFFFF9F2); // Notification tiles
+  static const Color paperAsh = Color(0xFFF7F0E6); // Input fields
+  static const Color paperWarm = Color(0xFFFFF3DC); // Selected / active cards
+  static const Color paperGrid = Color(0xFFFAF4EA); // Create-post doodle canvas
 
-  // ── Cream (Primary Action Surface) ────────────────────────────────
-  // Replaces gradient on all CTAs. Stamp-quality, zine-authentic.
-  static const Color cream100   = Color(0xFFFFF8E8); // Button fill, story ring solid
-  static const Color cream80    = Color(0xFFF5EDD4); // Button press state, story ring active
-  static const Color cream60    = Color(0xFFE8DDB8); // Nav active dot, secondary accents
-  static const Color cream08    = Color(0x14FFF8E8); // Unviewed story ring, subtle tint
+  // ── Accent Yellow (Primary CTA) ───────────────────────────────────
+  // Stitch: Post / Following / Create FAB
+  static const Color cream100 = Color(0xFFF0C84A); // Solid yellow CTA
+  static const Color cream80 = Color(0xFFE8B82E); // Pressed yellow
+  static const Color cream60 = Color(0xFFF5D76E); // Soft yellow (Following idle)
+  static const Color cream08 = Color(0x28F0C84A); // Subtle yellow tint
+
+  // ── Pastel Action Palette (Stitch feed chips) ─────────────────────
+  static const Color pastelPink = Color(0xFFFFB6C8); // Like chip fill
+  static const Color pastelMint = Color(0xFFA8E6CF); // Comment chip fill
+  static const Color pastelBlue = Color(0xFFA8D4F0); // Share / Message chip
+  static const Color pastelYellow = Color(0xFFF5E08A); // Bookmark chip
+  static const Color pastelLavender = Color(0xFFD4C4F0); // Extra accent
+  static const Color pastelPeach = Color(0xFFFFD0B5); // Extra accent
+  static const Color pastelRose = Color(0xFFF5C0C8); // Color swatch
+  static const Color pastelSky = Color(0xFFB8DCF5); // Color swatch
 
   // ── Text ──────────────────────────────────────────────────────────
-  static const Color textPrimary   = Color(0xFFF0E8D8); // Warm offwhite — all primary text
-  static const Color textSecondary = Color(0xFFA89880); // Warm clay mid — secondary text
-  // Raised from #6B5F50 for AA-ish contrast on ink backgrounds (timestamps / hints).
-  static const Color textTertiary  = Color(0xFF9A8B78); // Warm clay mid-light — timestamps
-  static const Color textOnCream   = Color(0xFF1A1610); // Near-black — text ON cream buttons
-  static const Color textMuted     = Color(0xFF6B5F50); // Disabled / placeholder (was tertiary)
+  static const Color textPrimary = Color(0xFF1A1610); // Near-black ink
+  static const Color textSecondary = Color(0xFF6B6560); // Warm mid-gray
+  static const Color textTertiary = Color(0xFF9A9288); // Timestamps / hints
+  static const Color textOnCream = Color(0xFF1A1610); // Text on yellow CTAs
+  static const Color textMuted = Color(0xFFB0A89C); // Disabled / placeholder
+  static const Color textOnDark = Color(0xFFF0E8D8); // Text on inkDeep overlays
 
-  // ── Semantic Reaction Colors (Ink Pens) ───────────────────────────
-  // Each is a different ink color in a doodle set. Muted, botanical, distinct.
-  static const Color like       = Color(0xFF7CB87A); // Fern green — botanical, not neon
-  static const Color dislike    = Color(0xFFC4714A); // Terracotta — earthy, not alarming
-  static const Color comment    = Color(0xFF6B8FA8); // Dusty slate — handwritten biro
-  static const Color heart      = Color(0xFFB8788A); // Warm mauve — personal, not fashion
-  static const Color reply      = Color(0xFF7CB87A); // Same as like (green = positive)
-  static const Color mention    = Color(0xFF8FA882); // Sage green — frog world, not tech
+  // ── Semantic Reaction Colors ──────────────────────────────────────
+  static const Color like = Color(0xFFE86B8A); // Heart pink
+  static const Color dislike = Color(0xFFC4714A); // Terracotta
+  static const Color comment = Color(0xFF4A9B7A); // Mint green text
+  static const Color heart = Color(0xFFE86B8A);
+  static const Color reply = Color(0xFF4A9B7A);
+  static const Color mention = Color(0xFF6B8FA8);
 
   // ── Notification Type Colors ──────────────────────────────────────
-  static const Color notifFollow  = Color(0xFF8FA882); // Sage — welcoming
-  static const Color notifLike    = Color(0xFF7CB87A); // Fern — positive
-  static const Color notifDislike = Color(0xFFC4714A); // Terracotta — notable
-  static const Color notifComment = Color(0xFF6B8FA8); // Dusty slate — informational
-  static const Color notifReply   = Color(0xFF7CB87A); // Fern — same as like
+  static const Color notifFollow = Color(0xFF6BA88A);
+  static const Color notifLike = Color(0xFFE86B8A);
+  static const Color notifDislike = Color(0xFFC4714A);
+  static const Color notifComment = Color(0xFF4A9B7A);
+  static const Color notifReply = Color(0xFF4A9B7A);
 
   // ── Doodle Stroke Colors ──────────────────────────────────────────
-  static const Color strokeOnDark  = Color(0xFFF0E8D8); // Cream ink on dark surfaces
-  static const Color strokeOnLight = Color(0xFF1E1A14); // Warm near-black on light
-  static const Color frogFill      = Color(0xFF4A7A3A); // Muted forest green
-  static const Color ghostFill     = Color(0xFFF0E8D8); // Ghost IS the paper — same as textPrimary
+  static const Color strokeInk = Color(0xFF1A1610); // Thick doodle outline
+  static const Color strokeOnDark = Color(0xFFF0E8D8);
+  static const Color strokeOnLight = Color(0xFF1A1610);
+  static const Color frogFill = Color(0xFF6BB86A);
+  static const Color ghostFill = Color(0xFFFFFFFF);
 
   // ── Borders ───────────────────────────────────────────────────────
-  static const Color borderSubtle  = Color(0x12FFF5DC); // 7% warm cream — default border
-  static const Color borderDefault = Color(0x1EFFF5DC); // 12% warm cream — hover/focus
-  static const Color borderStrong  = Color(0x38FFF5DC); // 22% warm cream — active border
+  static const Color borderSubtle = Color(0x1A1A1610); // 10% ink
+  static const Color borderDefault = Color(0x331A1610); // 20% ink
+  static const Color borderStrong = Color(0xFF1A1610); // Full ink outline
+  static const Color borderCard = Color(0xFF1A1610); // 2px card stroke
 
-  // ── Shadow System ─────────────────────────────────────────────────
-  // NO colored glows. Depth is weight, not color.
+  // ── Shadow System (soft paper depth) ──────────────────────────────
   static List<BoxShadow> shadowCard = [
-    const BoxShadow(color: Color(0x73000000), blurRadius: 12, offset: Offset(0, 2)),
-    const BoxShadow(color: Color(0x4D000000), blurRadius: 3,  offset: Offset(0, 1)),
+    const BoxShadow(
+      color: Color(0x14000000),
+      blurRadius: 0,
+      offset: Offset(0, 3),
+    ),
+    const BoxShadow(
+      color: Color(0x0A000000),
+      blurRadius: 8,
+      offset: Offset(0, 2),
+    ),
   ];
   static List<BoxShadow> shadowFloat = [
-    const BoxShadow(color: Color(0x8C000000), blurRadius: 24, offset: Offset(0, 4)),
-    const BoxShadow(color: Color(0x59000000), blurRadius: 6,  offset: Offset(0, 1)),
+    const BoxShadow(
+      color: Color(0x1A000000),
+      blurRadius: 16,
+      offset: Offset(0, 6),
+    ),
+    const BoxShadow(
+      color: Color(0x0F000000),
+      blurRadius: 4,
+      offset: Offset(0, 2),
+    ),
+  ];
+  static List<BoxShadow> shadowDoodle = [
+    const BoxShadow(
+      color: Color(0x1A1A1610),
+      blurRadius: 0,
+      offset: Offset(2, 3),
+    ),
   ];
 
-  // ── Warm Halos (Restrained — lamp, not laser) ─────────────────────
-  // Used sparingly: button press only, story ring pulse only
+  // ── Halos ─────────────────────────────────────────────────────────
   static List<BoxShadow> haloPress = [
-    const BoxShadow(color: Color(0x29FFF8E8), blurRadius: 16), // Cream halo on button tap
+    const BoxShadow(color: Color(0x33F0C84A), blurRadius: 12),
   ];
   static List<BoxShadow> haloStory = [
-    const BoxShadow(color: Color(0x38FFF8E8), blurRadius: 14), // Cream throb on story ring
+    const BoxShadow(color: Color(0x33F0C84A), blurRadius: 10),
   ];
   static List<BoxShadow> haloLike = [
-    const BoxShadow(color: Color(0x4D7CB87A), blurRadius: 12), // Fern — quiet, botanical
+    const BoxShadow(color: Color(0x40FFB6C8), blurRadius: 10),
   ];
   static List<BoxShadow> haloDislike = [
-    const BoxShadow(color: Color(0x4DC4714A), blurRadius: 12), // Terracotta — warm
+    const BoxShadow(color: Color(0x40C4714A), blurRadius: 10),
   ];
 
-  // ── Brand Gradient (RESERVED — splash icon treatment only) ────────
-  // Do NOT apply to buttons, text, nav, story rings, or any interactive element.
-  // This gradient's rarity is what makes it meaningful.
+  // ── Brand Gradient (splash / rare moments only) ───────────────────
   static const LinearGradient brandGradient = LinearGradient(
-    colors: [Color(0xFF6D28D9), Color(0xFFDB2777)],
+    colors: [Color(0xFFF0C84A), Color(0xFFFFB6C8)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  static const Color gradientStart = Color(0xFF6D28D9);
-  static const Color gradientEnd   = Color(0xFFDB2777);
+  static const Color gradientStart = Color(0xFFF0C84A);
+  static const Color gradientEnd = Color(0xFFFFB6C8);
   static const LinearGradient primaryGradient = brandGradient;
 
-  // ── Legacy mappings for compatibility ──────────────────────────────
+  // ── Story ring pastels (cycled) ───────────────────────────────────
+  static const List<Color> storyRingPastels = [
+    Color(0xFFFFB6C8), // pink
+    Color(0xFFF5E08A), // yellow
+    Color(0xFFA8D4F0), // blue
+    Color(0xFFA8E6CF), // mint
+    Color(0xFFD4C4F0), // lavender
+    Color(0xFFFFD0B5), // peach
+  ];
+
+  // ── Doodle color swatches (create post) ───────────────────────────
+  static const List<Color> doodleSwatches = [
+    Color(0xFFF5C0C8),
+    Color(0xFFF5E08A),
+    Color(0xFFB8DCF5),
+    Color(0xFFA8E6CF),
+    Color(0xFFD4C4F0),
+    Color(0xFFFFD0B5),
+    Color(0xFFF7F0E6),
+  ];
+
+  // ── Legacy / Material mappings ────────────────────────────────────
   static const Color primary = cream100;
   static const Color primaryContainer = cream60;
   static const Color primaryContainerLight = cream60;
   static const Color onPrimary = textOnCream;
-  static const Color onPrimaryContainer = cream100;
+  static const Color onPrimaryContainer = textPrimary;
   static const Color inversePrimary = cream80;
 
-  static const Color secondary = cream60;
+  static const Color secondary = pastelBlue;
   static const Color secondaryContainer = paperWarm;
-  static const Color onSecondary = textOnCream;
-  static const Color onSecondaryContainer = cream100;
+  static const Color onSecondary = textPrimary;
+  static const Color onSecondaryContainer = textPrimary;
 
   static const Color onSurfaceDark = textPrimary;
   static const Color onSurfaceVariantDark = textSecondary;
@@ -123,16 +178,16 @@ class AppColors {
   static const Color surfaceContainerHigh = inkMid;
   static const Color error = dislike;
   static const Color errorContainer = dislike;
-  static const Color onError = textOnCream;
+  static const Color onError = white;
   static const Color errorLight = dislike;
 
-  static const Color backgroundLight = Color(0xFFF9F9F9);
-  static const Color surfaceLight = Color(0xFFFFFFFF);
-  static const Color surfaceContainerLight = Color(0xFFF3F0F5);
-  static const Color surfaceContainerHighLight = Color(0xFFEDE8F0);
-  static const Color onSurfaceLight = Color(0xFF111111);
-  static const Color onSurfaceVariantLight = Color(0xFF555060);
-  static const Color outlineVariantLight = Color(0xFFE5E5E5);
+  static const Color backgroundLight = inkBase;
+  static const Color surfaceLight = inkMid;
+  static const Color surfaceContainerLight = paperAsh;
+  static const Color surfaceContainerHighLight = paperWarm;
+  static const Color onSurfaceLight = textPrimary;
+  static const Color onSurfaceVariantLight = textSecondary;
+  static const Color outlineVariantLight = borderSubtle;
 
   // Theme-aware helpers
   static Color bg(BuildContext context) => inkBase;
