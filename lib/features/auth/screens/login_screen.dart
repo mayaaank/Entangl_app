@@ -71,7 +71,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ref.watch(authNotifierProvider) is AsyncLoading;
 
     return Scaffold(
-      backgroundColor: AppColors.inkBase,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Background ambient subtle halo
@@ -138,13 +138,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       bottom: 32,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.inkMid,
-                      borderRadius: BorderRadius.circular(28),
+                      color: AppColors.surfaceLowest,
+                      borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: AppColors.borderSubtle,
-                        width: 0.5,
+                        color: AppColors.onSurface,
+                        width: 1.5,
                       ),
-                      boxShadow: AppColors.shadowFloat,
+                      boxShadow: AppColors.shadowCard,
                     ),
                     child: Form(
                       key: _formKey,
@@ -155,11 +155,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           Center(
                             child: Text(
                               'Welcome back',
-                              style: AppTextStyles.displayXl.copyWith(
-                                color: AppColors.cream100,
-                                fontSize: 32,
-                                height: 1.1,
-                              ),
+                              style: AppTextStyles.displayLg,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -218,7 +214,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 child: Text(
                                   'Sign up',
                                   style: AppTextStyles.bodyMedium.copyWith(
-                                    color: AppColors.cream100,
+                                    color: AppColors.primary,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),

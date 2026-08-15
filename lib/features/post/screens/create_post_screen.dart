@@ -7,6 +7,7 @@ import '../../../data/services/supabase_service.dart';
 import '../../../features/stories/widgets/create_story_sheet.dart';
 import '../../feed/providers/feed_provider.dart';
 import '../../profile/providers/profile_provider.dart';
+import '../../profile/providers/scraps_provider.dart';
 import '../providers/create_post_provider.dart';
 import '../widgets/create_post_form.dart';
 
@@ -22,6 +23,7 @@ class CreatePostScreen extends ConsumerWidget {
         if (uid != null) {
           ref.invalidate(profileStatsProvider(uid));
           ref.invalidate(userPostsProvider(uid));
+          ref.invalidate(scrapsProvider(uid));
         }
         ref.invalidate(createPostProvider);
         context.pop();
@@ -29,7 +31,7 @@ class CreatePostScreen extends ConsumerWidget {
       if (next.error != null) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(next.error!),
-          backgroundColor: AppColors.dislike,
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ));
       }
@@ -38,66 +40,41 @@ class CreatePostScreen extends ConsumerWidget {
     final state = ref.watch(createPostProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.inkBase,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.inkBase,
+        backgroundColor: AppColors.surface,
         elevation: 0,
+        centerTitle: true,
         leading: IconButton(
           onPressed: () {
             ref.invalidate(createPostProvider);
             context.pop();
           },
-          icon: const Icon(Icons.close_rounded, color: AppColors.textPrimary),
+          icon: const Icon(Icons.close_rounded, color: AppColors.onSurface),
         ),
         title: Text(
-          'New Post',
-          style: AppTextStyles.labelLarge.copyWith(
-            color: AppColors.textPrimary,
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
+          'New Entanglement',
+          style: AppTextStyles.title2.copyWith(
+            color: AppColors.primary,
+            fontStyle: FontStyle.italic,
           ),
         ),
         actions: [
-          // Story button
-          Padding(
-            padding: const EdgeInsets.only(right: 8, top: 10, bottom: 10),
-            child: GestureDetector(
-              onTap: () => showModalBottomSheet(
-                context: context,
-                backgroundColor: Colors.transparent,
-                isScrollControlled: true,
-                builder: (_) => const CreateStorySheet(),
-              ),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.inkWarm,
-                  borderRadius: BorderRadius.circular(100),
-                  border: Border.all(
-                    color: AppColors.borderSubtle,
-                    width: 0.5,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.auto_awesome_rounded, color: AppColors.cream100, size: 14),
-                    const SizedBox(width: 5),
-                    Text(
-                      'Story',
-                      style: AppTextStyles.labelMedium.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+          IconButton(
+            tooltip: 'Story',
+            onPressed: () => showModalBottomSheet(
+              context: context,
+              backgroundColor: Colors.transparent,
+              isScrollControlled: true,
+              builder: (_) => const CreateStorySheet(),
+            ),
+            icon: const Icon(
+              Icons.auto_awesome_rounded,
+              color: AppColors.secondary,
             ),
           ),
-          // Post button — uses canSubmit
           Padding(
-            padding: const EdgeInsets.only(right: 16, top: 10, bottom: 10),
+            padding: const EdgeInsets.only(right: 12, top: 10, bottom: 10),
             child: _PostButton(state: state),
           ),
         ],
@@ -116,48 +93,48 @@ class _PostButton extends ConsumerStatefulWidget {
 }
 
 class _PostButtonState extends ConsumerState<_PostButton> {
-  bool _isTapped = false;
+  bool _pressed = false;
 
   @override
   Widget build(BuildContext context) {
     final canPost = widget.state.canSubmit;
     return GestureDetector(
-      onTapDown: (_) => setState(() => _isTapped = true),
-      onTapUp: (_) => setState(() => _isTapped = false),
-      onTapCancel: () => setState(() => _isTapped = false),
+      onTapDown: canPost ? (_) => setState(() => _pressed = true) : null,
+      onTapUp: canPost ? (_) => setState(() => _pressed = false) : null,
+      onTapCancel: () => setState(() => _pressed = false),
       onTap: canPost
           ? () => ref.read(createPostProvider.notifier).submit()
           : null,
-      child: AnimatedScale(
-        scale: _isTapped && canPost ? 0.94 : 1.0,
-        duration: const Duration(milliseconds: 100),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          decoration: BoxDecoration(
-            color: canPost ? AppColors.cream100 : AppColors.inkWarm,
-            borderRadius: BorderRadius.circular(100),
-            border: Border.all(
-              color: AppColors.borderSubtle,
-              width: 0.5,
-            ),
-            boxShadow: canPost ? AppColors.shadowCard : null,
-          ),
-          child: widget.state.isSubmitting
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.textOnCream),
-                )
-              : Text(
-                  'Post',
-                  style: TextStyle(
-                    color: canPost ? AppColors.textOnCream : AppColors.textMuted,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                  ),
-                ),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 90),
+        transform: Matrix4.translationValues(
+          _pressed ? 2 : 0,
+          _pressed ? 2 : 0,
+          0,
         ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: canPost ? AppColors.surfaceLowest : AppColors.surfaceHigh,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.onSurface, width: 1.5),
+          boxShadow: canPost && !_pressed ? AppColors.shadowCard : null,
+        ),
+        child: widget.state.isSubmitting
+            ? const SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.onSurface,
+                ),
+              )
+            : Text(
+                'Post',
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: canPost ? AppColors.onSurface : AppColors.outline,
+                  letterSpacing: 0.4,
+                ),
+              ),
       ),
     );
   }

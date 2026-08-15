@@ -9,6 +9,7 @@ import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/post/screens/create_post_screen.dart';
 import '../../features/profile/screens/edit_profile_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
+import '../../features/settings/screens/privacy_settings_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
 
 class AppRoutes {
@@ -22,6 +23,7 @@ class AppRoutes {
   static const otherProfile  = '/profile/:userId';
   static const editProfile   = '/profile/edit';
   static const settings      = '/settings';
+  static const privacy       = '/settings/privacy';
 }
 
 final routerProvider = Provider<GoRouter>((_) {
@@ -53,7 +55,16 @@ final routerProvider = Provider<GoRouter>((_) {
           userId: state.pathParameters['userId']!,
         ),
       ),
-      GoRoute(path: AppRoutes.settings, builder: (_, __) => const SettingsScreen()),
+      GoRoute(
+        path: AppRoutes.settings,
+        builder: (_, __) => const SettingsScreen(),
+        routes: [
+          GoRoute(
+            path: 'privacy',
+            builder: (_, __) => const PrivacySettingsScreen(),
+          ),
+        ],
+      ),
     ],
   );
 });

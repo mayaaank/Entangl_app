@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/entangl_colors.dart';
 import '../../../data/models/story_model.dart';
+import '../../../data/models/user_model.dart';
 import '../../../data/services/supabase_service.dart';
 import '../../../shared/widgets/avatar_widget.dart';
+import '../../profile/providers/profile_provider.dart';
 import '../providers/stories_provider.dart';
 import '../screens/story_viewer_screen.dart';
+import 'create_story_sheet.dart';
+
+
 
 class StoryCirclesRow extends ConsumerWidget {
   const StoryCirclesRow({super.key});
@@ -14,139 +20,218 @@ class StoryCirclesRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final storiesAsync = ref.watch(storiesProvider);
+    final me = ref.watch(ownProfileProvider).valueOrNull;
+    final uid = SupabaseService.currentUserId;
 
     return storiesAsync.when(
       loading: () => const _SkeletonRow(),
-      error: (_, __) => const SizedBox.shrink(),
-      data: (userStories) {
-        if (userStories.isEmpty) return const SizedBox.shrink();
-        return SizedBox(
-          height: 96,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            itemCount: userStories.length,
-            itemBuilder: (_, i) {
-              final us = userStories[i];
-              return _StoryCircle(
-                userStory: us,
-                onTap: () => Navigator.of(context).push(
-                  PageRouteBuilder(
-                    pageBuilder: (_, __, ___) => StoryViewerScreen(
-                      allUserStories: userStories,
-                      initialUserIndex: i,
-                    ),
-                    transitionsBuilder: (_, anim, __, child) =>
-                        FadeTransition(opacity: anim, child: child),
-                    transitionDuration: const Duration(milliseconds: 180),
-                  ),
-                ),
-              );
-            },
+      error: (_, __) => _row(context, const <UserStories>[], me, uid),
+      data: (userStories) => _row(context, userStories, me, uid),
+    );
+  }
+
+  Widget _row(
+    BuildContext context,
+    List<UserStories> userStories,
+    UserModel? me,
+    String? uid,
+  ) {
+    final others = uid == null
+        ? userStories
+        : userStories.where((us) => us.user.id != uid).toList();
+    UserStories? own;
+    if (uid != null) {
+      for (final us in userStories) {
+        if (us.user.id == uid) {
+          own = us;
+          break;
+        }
+      }
+    }
+
+    final ownStories = own;
+    return ListView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      children: [
+        _AddStoryCircle(
+          avatarUrl: me?.avatarUrl ?? ownStories?.user.avatarUrl,
+          hasStory: ownStories != null && ownStories.stories.isNotEmpty,
+          onAdd: () => showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.transparent,
+            isScrollControlled: true,
+            builder: (_) => const CreateStorySheet(),
           ),
-        );
-      },
+          onOpen: ownStories == null
+              ? null
+              : () => _openViewer(
+                    context,
+                    userStories,
+                    userStories.indexOf(ownStories),
+                  ),
+        ),
+        ...others.asMap().entries.map((e) {
+          return _StoryCircle(
+            userStory: e.value,
+            onTap: () => _openViewer(context, userStories, userStories.indexOf(e.value)),
+          );
+        }),
+      ],
+    );
+  }
+
+  void _openViewer(
+    BuildContext context,
+    List<UserStories> all,
+    int index,
+  ) {
+    if (index < 0) return;
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => StoryViewerScreen(
+          allUserStories: all,
+          initialUserIndex: index,
+        ),
+        transitionsBuilder: (_, anim, __, child) =>
+            FadeTransition(opacity: anim, child: child),
+        transitionDuration: const Duration(milliseconds: 180),
+      ),
     );
   }
 }
 
-class _StoryCircle extends StatefulWidget {
-  final UserStories userStory;
-  final VoidCallback onTap;
+class _AddStoryCircle extends StatelessWidget {
+  final String? avatarUrl;
+  final bool hasStory;
+  final VoidCallback onAdd;
+  final VoidCallback? onOpen;
 
-  const _StoryCircle({required this.userStory, required this.onTap});
-
-  @override
-  State<_StoryCircle> createState() => _StoryCircleState();
-}
-
-class _StoryCircleState extends State<_StoryCircle> {
-  bool _isTapped = false;
+  const _AddStoryCircle({
+    required this.avatarUrl,
+    required this.hasStory,
+    required this.onAdd,
+    this.onOpen,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final isOwn = widget.userStory.user.id == SupabaseService.currentUserId;
-    final viewed = widget.userStory.allViewed;
-    final name = isOwn ? 'Your story' : widget.userStory.user.fullName.split(' ').first;
-
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isTapped = true),
-      onTapUp: (_) => setState(() => _isTapped = false),
-      onTapCancel: () => setState(() => _isTapped = false),
-      onTap: widget.onTap,
-      child: AnimatedScale(
-        scale: _isTapped ? 0.94 : 1.0,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeOutCubic,
+    return Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: GestureDetector(
+        onTap: hasStory ? onOpen : onAdd,
         child: SizedBox(
-          width: 70,
+          width: 72,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Outer border ring
-                  WidgetBorderRing(viewed: viewed),
-                  // Gap ring using inkBase
-                  Container(
-                    width: 57,
-                    height: 57,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.inkBase,
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.surfaceHigh,
+                  border: Border.all(color: AppColors.outline, width: 1.5),
+                ),
+                child: Stack(
+                  children: [
+                    Center(
+                      child: AvatarWidget(imageUrl: avatarUrl, size: 56),
                     ),
-                  ),
-                  // Avatar
-                  AvatarWidget(
-                    imageUrl: widget.userStory.user.avatarUrl,
-                    size: 52,
-                  ),
-                  // Add badge — bottom right only for own story
-                  if (isOwn)
                     Positioned(
+                      right: 0,
                       bottom: 0,
-                      right: 2,
-                      child: Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: AppColors.cream100,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.inkBase,
-                            width: 1.5,
-                          ),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black38,
-                              blurRadius: 4,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.add_rounded,
-                          color: AppColors.textOnCream,
-                          size: 13,
-                        ),
-                      ),
+                      child: _plusBadge(),
                     ),
-                ],
+                  ],
+                ),
               ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 8),
               Text(
-                name,
-                style: TextStyle(
-                  color: viewed
-                      ? AppColors.textSecondary.withOpacity(0.45)
-                      : AppColors.textPrimary,
-                  fontSize: 11,
-                  fontWeight: viewed ? FontWeight.w400 : FontWeight.w600,
+                'Your Story',
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                  letterSpacing: 0,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _plusBadge() {
+    return GestureDetector(
+      onTap: onAdd,
+      child: Container(
+        width: 20,
+        height: 20,
+        decoration: BoxDecoration(
+          color: AppColors.secondaryContainer,
+          shape: BoxShape.circle,
+          border: Border.all(color: AppColors.onSurface, width: 1.5),
+        ),
+        child: const Icon(Icons.add_rounded, size: 12),
+      ),
+    );
+  }
+}
+
+class _StoryCircle extends StatelessWidget {
+  final UserStories userStory;
+  final VoidCallback onTap;
+
+  const _StoryCircle({
+    required this.userStory,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final viewed = userStory.allViewed;
+    final name = userStory.user.fullName.split(' ').first;
+    final palette = context.palette;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: GestureDetector(
+        onTap: onTap,
+        child: SizedBox(
+          width: 72,
+          child: Column(
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: viewed ? palette.surfaceHigh : palette.onSurface,
+                  border: Border.all(color: palette.outline, width: 1.5),
+                ),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.surface,
+                  ),
+                  alignment: Alignment.center,
+                  child: AvatarWidget(
+                    imageUrl: userStory.user.avatarUrl,
+                    size: 48,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                name,
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                  letterSpacing: 0,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -156,74 +241,38 @@ class _StoryCircleState extends State<_StoryCircle> {
   }
 }
 
-class WidgetBorderRing extends StatelessWidget {
-  final bool viewed;
-  const WidgetBorderRing({super.key, required this.viewed});
-
-  @override
-  Widget build(BuildContext context) {
-    final ring = Container(
-      width: 62,
-      height: 62,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: viewed ? Colors.transparent : AppColors.cream100,
-        border: viewed ? Border.all(color: AppColors.borderSubtle, width: 1.5) : null,
-        boxShadow: viewed ? null : AppColors.haloStory,
-      ),
-    );
-
-    if (viewed) return ring;
-
-    // Pulse animation for unviewed stories
-    return ring
-        .animate(onPlay: (controller) => controller.repeat(reverse: true))
-        .scaleXY(begin: 1.0, end: 1.04, duration: 1500.ms, curve: Curves.easeInOut);
-  }
-}
-
 class _SkeletonRow extends StatelessWidget {
   const _SkeletonRow();
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 96,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        itemCount: 5,
-        itemBuilder: (_, __) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.inkWarm,
-                  ),
-                )
-                    .animate(onPlay: (c) => c.repeat())
-                    .shimmer(duration: 1500.ms, color: AppColors.inkMid),
-                const SizedBox(height: 6),
-                Container(
-                  width: 38,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    color: AppColors.inkWarm,
-                  ),
-                )
-                    .animate(onPlay: (c) => c.repeat())
-                    .shimmer(duration: 1500.ms, color: AppColors.inkMid),
-              ],
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: 4,
+      itemBuilder: (_, __) => Padding(
+        padding: const EdgeInsets.only(right: 12),
+        child: Column(
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.surfaceHigh,
+              ),
             ),
-          );
-        },
+            const SizedBox(height: 8),
+            Container(
+              width: 40,
+              height: 8,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceHigh,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

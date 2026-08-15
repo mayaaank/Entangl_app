@@ -29,9 +29,7 @@ class EditProfileScreen extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back_ios_new,
               color: AppColors.onSurfaceDark, size: 20),
         ),
-        title: Text('Edit Profile',
-            style: AppTextStyles.labelLarge
-                .copyWith(color: AppColors.onSurfaceDark)),
+        title: Text('Edit Profile', style: AppTextStyles.title2),
       ),
       body: const EditProfileForm(),
     );

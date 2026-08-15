@@ -18,7 +18,7 @@ class NotificationsScreen extends ConsumerWidget {
     final notifier = ref.read(notificationsProvider.notifier);
 
     return Scaffold(
-      backgroundColor: AppColors.inkBase,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: ConnectAppBar(
         leading: IconButton(
           onPressed: () => context.pop(),
@@ -30,7 +30,7 @@ class NotificationsScreen extends ConsumerWidget {
           child: const Text(
             'Mark all read',
             style: TextStyle(
-              color: AppColors.cream100,
+              color: AppColors.primary,
               fontWeight: FontWeight.w600,
               fontSize: 13,
             ),

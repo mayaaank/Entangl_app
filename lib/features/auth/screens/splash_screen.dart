@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../data/services/push_notification_service.dart';
 import '../../../shared/widgets/mascot_widgets.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -22,16 +23,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     Future.delayed(const Duration(milliseconds: 2500), _navigate);
   }
 
-  void _navigate() {
+  Future<void> _navigate() async {
     if (!mounted) return;
     final hasSession = Supabase.instance.client.auth.currentSession != null;
+    if (hasSession) {
+      // Cold-start with existing session: refresh FCM token in device_tokens.
+      await PushNotificationService.instance.syncWithPreferences();
+    }
+    if (!mounted) return;
     context.go(hasSession ? AppRoutes.home : AppRoutes.login);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.inkBase, // Warm ink background
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Subtle ambient glow in the center
@@ -90,14 +96,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                // Subtitle "connect" lowercase, whispered spacing
                 Text(
-                  'connect',
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.textTertiary,
-                    fontSize: 16,
-                    letterSpacing: 16 * 0.3, // 0.3em
-                  ),
+                  'entangl',
+                  style: AppTextStyles.brandName,
                 )
                     .animate(delay: 800.ms)
                     .fadeIn(duration: 600.ms)

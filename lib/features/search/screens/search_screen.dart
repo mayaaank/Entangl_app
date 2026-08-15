@@ -17,9 +17,9 @@ class UserSearchDelegate extends SearchDelegate {
 
   @override
   ThemeData appBarTheme(BuildContext context) => Theme.of(context).copyWith(
-        scaffoldBackgroundColor: AppColors.inkBase,
+        scaffoldBackgroundColor: AppColors.surface,
         appBarTheme: const AppBarTheme(
-          backgroundColor: AppColors.inkBase,
+          backgroundColor: AppColors.surface,
           elevation: 0,
         ),
         inputDecorationTheme: const InputDecorationTheme(
@@ -83,7 +83,7 @@ class _SearchResults extends ConsumerWidget {
               const FrogMascot(expression: FrogExpression.waving, size: 96),
               const SizedBox(height: 20),
               Text(
-                'Search for connections',
+                'Find people to tangle with',
                 style: AppTextStyles.displayMd.copyWith(color: AppColors.textPrimary),
               ),
               const SizedBox(height: 8),
