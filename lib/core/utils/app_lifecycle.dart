@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../data/services/push_notification_service.dart';
 import '../theme/app_colors.dart';
 
 class AppLifecycleWrapper extends StatefulWidget {
@@ -45,6 +46,8 @@ class _AppLifecycleWrapperState extends State<AppLifecycleWrapper>
     if (state == AppLifecycleState.resumed) {
       _checkConnectivity();
       _refreshSessionSilently();
+      // Keep device_tokens fresh when returning to the app.
+      unawaited(PushNotificationService.instance.syncWithPreferences());
     }
   }
 
