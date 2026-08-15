@@ -48,3 +48,6 @@ app.*.map.json
 # Contains real Supabase keys — never commit this file
 lib/core/secrets.dart
 lib/core/secrets.dart.example
+ui_ux
+DESIGN.md
+PRODUCT.md
