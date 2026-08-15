@@ -19,4 +19,14 @@ class AppConstants {
   static const int bioMaxLength      = 160;
   static const int postMaxLength     = 500;
   static const int passwordMinLength = 6;
+
+  /// Profile emails that can open Admin Requests.
+  static const adminEmails = [
+    'rekt11.cam@gmail.com',
+  ];
+
+  static bool isAdminEmail(String? email) {
+    if (email == null || email.isEmpty) return false;
+    return adminEmails.contains(email.toLowerCase());
+  }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../data/repositories/auth_repository.dart';
+import '../../../data/repositories/users_repository.dart';
 import '../../../data/services/push_notification_service.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((_) => AuthRepository());
@@ -41,6 +42,7 @@ class AuthNotifier extends AsyncNotifier<void> {
             fullName: fullName,
             username: username,
           );
+      await UsersRepository().markOwnProfilePending();
       try {
         await PushNotificationService.instance.syncWithPreferences();
       } catch (_) {}

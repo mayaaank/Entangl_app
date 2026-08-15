@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/entangl_colors.dart';
 import '../../../core/utils/snackbar.dart';
+import '../../../data/services/supabase_service.dart';
 import '../../../shared/providers/theme_provider.dart';
 import '../../../shared/widgets/connect_app_bar.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../settings/providers/settings_provider.dart';
+import '../../settings/widgets/change_email_sheet.dart';
 import '../../settings/widgets/change_password_sheet.dart';
 import '../../settings/widgets/delete_account_dialog.dart';
 import '../../settings/widgets/settings_section.dart';
@@ -23,6 +26,8 @@ class SettingsScreen extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
     final palette = context.palette;
     final pushOn = notifs.pushEnabled;
+    final isAdmin =
+        AppConstants.isAdminEmail(SupabaseService.currentEmail);
 
     return Scaffold(
       backgroundColor: palette.surface,
@@ -136,6 +141,30 @@ class SettingsScreen extends ConsumerWidget {
                   label: 'Privacy Settings',
                   onTap: () => context.push(AppRoutes.privacy),
                 ),
+                Divider(height: 1, indent: 56, color: palette.outlineVariant),
+                SettingsChevronRow(
+                  icon: Icons.alternate_email,
+                  label: 'Change Email',
+                  subtitle: 'Needs admin approval',
+                  onTap: () async {
+                    final ok = await showChangeEmailSheet(context);
+                    if (ok && context.mounted) {
+                      showSuccessSnackBar(
+                        context,
+                        'Email change submitted for review.',
+                      );
+                    }
+                  },
+                ),
+                if (isAdmin) ...[
+                  Divider(height: 1, indent: 56, color: palette.outlineVariant),
+                  SettingsChevronRow(
+                    icon: Icons.admin_panel_settings_outlined,
+                    label: 'Admin Requests',
+                    subtitle: 'Registrations and email changes',
+                    onTap: () => context.push(AppRoutes.adminRequests),
+                  ),
+                ],
               ],
             ),
             const SizedBox(height: 28),

@@ -62,5 +62,27 @@ void main() {
       expect(updated.bio, 'New bio');
       expect(updated.avatarUrl, isNull);
     });
+
+    test('legacy profiles without status are approved', () {
+      final user = UserModel.fromJson({
+        'id': 'user-123',
+        'username': 'johndoe',
+        'full_name': 'John Doe',
+        'created_at': '2026-05-22T20:00:00Z',
+      });
+      expect(user.status, 'approved');
+      expect(user.isApproved, isTrue);
+    });
+
+    test('pending profiles are not approved', () {
+      const user = UserModel(
+        id: 'u',
+        username: 'x',
+        fullName: 'X',
+        createdAt: '',
+        status: 'pending',
+      );
+      expect(user.isApproved, isFalse);
+    });
   });
 }

@@ -10,6 +10,7 @@ import '../../../shared/widgets/gradient_button.dart';
 import '../../../shared/widgets/mascot_widgets.dart';
 import '../../../shared/widgets/doodle_widget.dart';
 import '../providers/auth_provider.dart';
+import '../utils/auth_landing.dart';
 import '../widgets/auth_field.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -42,9 +43,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!mounted) return;
     final authState = ref.read(authNotifierProvider);
     if (authState is AsyncError) {
-      _showError(humaniseAuthError(authState.error!));
+      _showError(humaniseAuthError(authState.error));
     } else {
-      context.go(AppRoutes.home);
+      final dest = await landingRouteAfterAuth();
+      if (mounted) context.go(dest);
     }
   }
 
@@ -198,6 +200,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             label: 'Sign In',
                             onTap: isLoading ? null : _submit,
                             isLoading: isLoading,
+                          ),
+                          const SizedBox(height: 16),
+                          Center(
+                            child: GestureDetector(
+                              onTap: () =>
+                                  context.push(AppRoutes.forgotPassword),
+                              child: Text(
+                                'Forgot password?',
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
                           ),
                           const SizedBox(height: 24),
                           Row(

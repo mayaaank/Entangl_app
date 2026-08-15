@@ -10,6 +10,7 @@ import '../../../shared/widgets/gradient_button.dart';
 import '../../../shared/widgets/mascot_widgets.dart';
 import '../../../shared/widgets/doodle_widget.dart';
 import '../providers/auth_provider.dart';
+import '../utils/auth_landing.dart';
 import '../widgets/auth_field.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -75,9 +76,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final authState = ref.read(authNotifierProvider);
     if (authState is AsyncError) {
       setState(() => _frogExpression = FrogExpression.confused);
-      _showError(humaniseAuthError(authState.error!));
+      _showError(humaniseAuthError(authState.error));
     } else {
-      context.go(AppRoutes.home);
+      final dest = await landingRouteAfterAuth();
+      if (mounted) context.go(dest);
     }
   }
 

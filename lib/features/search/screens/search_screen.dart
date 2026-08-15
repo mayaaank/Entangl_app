@@ -5,6 +5,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/avatar_widget.dart';
 import '../../../shared/widgets/mascot_widgets.dart';
+import '../../../data/models/user_model.dart';
+import '../providers/recent_search_provider.dart';
 import '../providers/search_provider.dart';
 
 /// SearchDelegate — pure UI. Reads searchResultsProvider only.
@@ -44,57 +46,133 @@ class UserSearchDelegate extends SearchDelegate {
         icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary, size: 20),
       );
 
+  Future<void> _openUser(BuildContext context, UserModel user) async {
+    await ref.read(recentSearchProvider.notifier).add(user);
+    if (!context.mounted) return;
+    close(context, null);
+    context.push('/profile/${user.id}');
+  }
+
+  Future<void> _openRecent(
+    BuildContext context,
+    RecentSearchEntry entry,
+  ) async {
+    close(context, null);
+    context.push('/profile/${entry.id}');
+  }
+
   @override
   Widget buildResults(BuildContext context) => _SearchResults(
         query: query,
         ref: ref,
-        onTap: (id) {
-          close(context, null);
-          context.push('/profile/$id');
-        },
+        onTap: (user) => _openUser(context, user),
       );
 
   @override
-  Widget buildSuggestions(BuildContext context) => _SearchResults(
-        query: query,
-        ref: ref,
-        onTap: (id) {
-          close(context, null);
-          context.push('/profile/$id');
-        },
+  Widget buildSuggestions(BuildContext context) {
+    if (query.trim().isEmpty) {
+      return _RecentSearches(
+        onOpen: (entry) => _openRecent(context, entry),
       );
+    }
+    return _SearchResults(
+      query: query,
+      ref: ref,
+      onTap: (user) => _openUser(context, user),
+    );
+  }
+}
+
+class _RecentSearches extends ConsumerWidget {
+  final ValueChanged<RecentSearchEntry> onOpen;
+
+  const _RecentSearches({required this.onOpen});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final recentAsync = ref.watch(recentSearchProvider);
+    return recentAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (recent) {
+        if (recent.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const FrogMascot(expression: FrogExpression.waving, size: 96),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Find people to tangle with',
+                    style: AppTextStyles.displayMd
+                        .copyWith(color: AppColors.textPrimary),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Find your friends by name or @username',
+                    style: AppTextStyles.bodyMedium
+                        .copyWith(color: AppColors.textTertiary),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 24),
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Text('RECENT', style: AppTextStyles.sectionLabel()),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () =>
+                        ref.read(recentSearchProvider.notifier).clear(),
+                    child: const Text('Clear'),
+                  ),
+                ],
+              ),
+            ),
+            ...recent.map(
+              (e) => ListTile(
+                leading: AvatarWidget(imageUrl: e.avatarUrl, size: 44),
+                title: Text(e.fullName, style: AppTextStyles.labelLarge),
+                subtitle: Text(
+                  '@${e.username}',
+                  style: AppTextStyles.timestamp.copyWith(
+                    color: AppColors.textTertiary,
+                  ),
+                ),
+                trailing: IconButton(
+                  tooltip: 'Remove',
+                  icon: const Icon(Icons.close_rounded, size: 18),
+                  onPressed: () =>
+                      ref.read(recentSearchProvider.notifier).remove(e.id),
+                ),
+                onTap: () => onOpen(e),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class _SearchResults extends ConsumerWidget {
   final String query;
   final WidgetRef ref;
-  final ValueChanged<String> onTap;
+  final ValueChanged<UserModel> onTap;
   const _SearchResults({required this.query, required this.ref, required this.onTap});
 
   @override
   Widget build(BuildContext context, WidgetRef _) {
     if (query.trim().isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const FrogMascot(expression: FrogExpression.waving, size: 96),
-              const SizedBox(height: 20),
-              Text(
-                'Find people to tangle with',
-                style: AppTextStyles.displayMd.copyWith(color: AppColors.textPrimary),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Find your friends by name or @username',
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textTertiary),
-              ),
-            ],
-          ),
-        ),
-      );
+      return const SizedBox.shrink();
     }
     final async = ref.watch(searchResultsProvider(query));
     return async.when(
@@ -138,7 +216,7 @@ class _SearchResults extends ConsumerWidget {
                     '@${u.username}',
                     style: AppTextStyles.timestamp.copyWith(color: AppColors.textTertiary),
                   ),
-                  onTap: () => onTap(u.id),
+                  onTap: () => onTap(u),
                 );
               },
             ),

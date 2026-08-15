@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../data/services/push_notification_service.dart';
 import '../../../shared/widgets/mascot_widgets.dart';
+import '../utils/auth_landing.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -31,7 +32,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       await PushNotificationService.instance.syncWithPreferences();
     }
     if (!mounted) return;
-    context.go(hasSession ? AppRoutes.home : AppRoutes.login);
+    if (!hasSession) {
+      context.go(AppRoutes.login);
+      return;
+    }
+    final dest = await landingRouteAfterAuth();
+    if (mounted) context.go(dest);
   }
 
   @override

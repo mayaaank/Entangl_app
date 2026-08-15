@@ -33,6 +33,7 @@ void main() {
     expect(find.text('Push Notifications'), findsOneWidget);
     expect(find.text('Change Password'), findsOneWidget);
     expect(find.text('Privacy Settings'), findsOneWidget);
+    expect(find.text('Change Email'), findsOneWidget);
     expect(find.text('Delete Account'), findsOneWidget);
   });
 

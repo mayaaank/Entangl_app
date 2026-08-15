@@ -120,6 +120,93 @@ class UsersRepository {
         .toList();
   }
 
+  Future<void> markOwnProfilePending() async {
+    final uid = SupabaseService.currentUserId;
+    if (uid == null) return;
+    for (var i = 0; i < 6; i++) {
+      try {
+        final row = await _db
+            .from('profiles')
+            .select('id')
+            .eq('id', uid)
+            .maybeSingle();
+        if (row != null) {
+          await _db
+              .from('profiles')
+              .update({'status': 'pending'})
+              .eq('id', uid);
+          return;
+        }
+      } catch (_) {}
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+    }
+  }
+
+  Future<void> requestEmailChange(String newEmail) async {
+    final uid = SupabaseService.currentUserId!;
+    final profile = await _db
+        .from('profiles')
+        .select('status')
+        .eq('id', uid)
+        .single();
+    final status =
+        (profile as Map<String, dynamic>)['status'] as String? ?? '';
+    if (status.startsWith('email_change_pending:')) {
+      throw Exception('An email change request is already pending.');
+    }
+    await _db
+        .from('profiles')
+        .update({'status': 'email_change_pending:$newEmail'})
+        .eq('id', uid);
+  }
+
+  Future<void> processApprovedEmailChange() async {
+    final uid = SupabaseService.currentUserId!;
+    await _db.from('profiles').update({'status': 'approved'}).eq('id', uid);
+  }
+
+  Future<List<UserModel>> getPendingUsers() async {
+    final rows = await _db
+        .from('profiles')
+        .select('id, username, full_name, avatar_url, status, created_at')
+        .inFilter('status', ['pending', 'rejected'])
+        .order('created_at', ascending: false);
+    return (rows as List)
+        .map((r) => UserModel.fromJson(r as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<List<UserModel>> getEmailChangeRequests() async {
+    final rows = await _db
+        .from('profiles')
+        .select('id, username, full_name, avatar_url, status, created_at')
+        .like('status', 'email_change_pending:%')
+        .order('created_at', ascending: false);
+    return (rows as List)
+        .map((r) => UserModel.fromJson(r as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> approveUser(String userId) => _db
+      .from('profiles')
+      .update({'status': 'approved'})
+      .eq('id', userId);
+
+  Future<void> rejectUser(String userId) => _db
+      .from('profiles')
+      .update({'status': 'rejected'})
+      .eq('id', userId);
+
+  Future<void> approveEmailChange(String userId, String newEmail) => _db
+      .from('profiles')
+      .update({'status': 'email_change_approved:$newEmail'})
+      .eq('id', userId);
+
+  Future<void> rejectEmailChange(String userId) => _db
+      .from('profiles')
+      .update({'status': 'approved'})
+      .eq('id', userId);
+
   List<UserModel> _extractProfiles(List rows) {
     return rows.map((item) {
       final p = item['profiles'];

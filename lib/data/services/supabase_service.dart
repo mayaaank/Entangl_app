@@ -8,4 +8,12 @@ class SupabaseService {
   static User?    get currentUser   => client.auth.currentUser;
   static String?  get currentUserId => currentUser?.id;
   static Session? get currentSession => client.auth.currentSession;
+
+  static String? get currentEmail {
+    try {
+      return currentUser?.email;
+    } catch (_) {
+      return null;
+    }
+  }
 }

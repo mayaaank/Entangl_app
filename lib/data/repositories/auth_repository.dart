@@ -29,6 +29,18 @@ class AuthRepository {
 
   Future<void> signOut() => _client.auth.signOut();
 
+  Future<void> resetPassword(String email) =>
+      _client.auth.resetPasswordForEmail(email);
+
+  Future<void> updateEmail(String newEmail) async {
+    final res = await _client.auth.updateUser(
+      UserAttributes(email: newEmail),
+    );
+    if (res.user == null) throw Exception('Failed to update email');
+  }
+
+  String? get currentEmail => _client.auth.currentUser?.email;
+
   Future<void> changePassword({
     required String currentPassword,
     required String newPassword,
