@@ -28,4 +28,38 @@ class AuthRepository {
   }
 
   Future<void> signOut() => _client.auth.signOut();
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final email = _client.auth.currentUser?.email;
+    if (email == null || email.isEmpty) {
+      throw Exception('No email on this account.');
+    }
+    await _client.auth.signInWithPassword(
+      email: email,
+      password: currentPassword,
+    );
+    await _client.auth.updateUser(UserAttributes(password: newPassword));
+  }
+
+  Future<void> signOutOtherSessions() =>
+      _client.auth.signOut(scope: SignOutScope.others);
+
+  /// Removes this user's scraps, then signs out.
+  /// Full auth-user deletion needs a privileged backend function.
+  Future<void> deleteAccount({required String password}) async {
+    final user = _client.auth.currentUser;
+    final email = user?.email;
+    if (user == null || email == null || email.isEmpty) {
+      throw Exception('No email on this account.');
+    }
+    await _client.auth.signInWithPassword(email: email, password: password);
+    await _client.from('posts').delete().eq('user_id', user.id);
+    try {
+      await _client.rpc('delete_own_account');
+    } catch (_) {}
+    await _client.auth.signOut();
+  }
 }

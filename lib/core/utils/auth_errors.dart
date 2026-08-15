@@ -41,10 +41,22 @@ String humaniseAuthError(Object error) {
     return 'Password must be at least 6 characters.';
   }
 
+  // DNS / wrong API host (often mislabeled as "no internet")
+  if (msg.contains('failed host lookup') ||
+      msg.contains('name or service not known') ||
+      msg.contains('nodename nor servname') ||
+      msg.contains('xmlhttprequest error')) {
+    return 'Cannot reach the server. Check the app configuration or try again.';
+  }
+
   // Network error
   if (msg.contains('socketexception') ||
-      msg.contains('network') ||
-      msg.contains('connection refused')) {
+      msg.contains('clientexception') ||
+      msg.contains('connection refused') ||
+      msg.contains('connection reset') ||
+      msg.contains('network is unreachable') ||
+      msg.contains('timed out') ||
+      msg.contains('timeout')) {
     return 'No internet connection. Please check your network.';
   }
 

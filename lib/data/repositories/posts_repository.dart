@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/layout/media_metrics.dart';
+import '../../core/theme/collage_layout.dart';
+import '../../core/theme/post_format.dart';
 import '../models/post_model.dart';
 import '../services/supabase_service.dart';
 
@@ -41,7 +44,7 @@ class PostsRepository {
           .order('created_at', ascending: false)
           .range(offset, offset + AppConstants.feedPageSize - 1);
 
-      debugPrint('CONNECT: fetched ${(rows as List).length} posts');
+      debugPrint('ENTANGL: fetched ${(rows as List).length} posts');
 
       return (rows as List)
           .map((r) => PostModel.fromJson(
@@ -50,8 +53,8 @@ class PostsRepository {
               ))
           .toList();
     } catch (e, st) {
-      debugPrint('CONNECT ERROR getFeedPosts: $e');
-      debugPrint('CONNECT STACK: $st');
+      debugPrint('ENTANGL ERROR getFeedPosts: $e');
+      debugPrint('ENTANGL STACK: $st');
       rethrow;
     }
   }
@@ -89,7 +92,7 @@ class PostsRepository {
           .order('created_at', ascending: false)
           .range(offset, offset + AppConstants.feedPageSize - 1);
 
-      debugPrint('CONNECT: fetched ${(rows as List).length} user posts');
+      debugPrint('ENTANGL: fetched ${(rows as List).length} user posts');
 
       return (rows as List)
           .map((r) => PostModel.fromJson(
@@ -98,18 +101,51 @@ class PostsRepository {
               ))
           .toList();
     } catch (e, st) {
-      debugPrint('CONNECT ERROR getUserPosts: $e');
-      debugPrint('CONNECT STACK: $st');
+      debugPrint('ENTANGL ERROR getUserPosts: $e');
+      debugPrint('ENTANGL STACK: $st');
       rethrow;
     }
   }
 
-  Future<void> createPost({required String content, File? imageFile}) async {
+  Future<void> createPost({
+    required String content,
+    File? imageFile,
+    PostFormat format = PostFormat.text,
+    List<File>? collageFiles,
+    CollageLayout? collageLayout,
+    int? imageWidth,
+    int? imageHeight,
+  }) async {
     final uid = SupabaseService.currentUserId!;
     String? imageUrl;
-    if (imageFile != null) {
-      final ext  = imageFile.path.split('.').last;
-      final path = '$uid/${DateTime.now().millisecondsSinceEpoch}.$ext';
+
+    if (format == PostFormat.collage &&
+        collageFiles != null &&
+        collageFiles.isNotEmpty &&
+        collageLayout != null) {
+      final urls = <String>[];
+      for (var i = 0; i < collageFiles.length; i++) {
+        final file = collageFiles[i];
+        final ext = file.path.split('.').last;
+        final path =
+            '$uid/${DateTime.now().millisecondsSinceEpoch}_${i}_collage.$ext';
+        await _db.storage
+            .from(AppConstants.postImagesBucket)
+            .upload(path, file);
+        urls.add(
+          _db.storage.from(AppConstants.postImagesBucket).getPublicUrl(path),
+        );
+      }
+      imageUrl = CollagePayload(layout: collageLayout, urls: urls).encode();
+    } else if (imageFile != null && format.isMedia) {
+      final ext = imageFile.path.split('.').last;
+      final path = MediaMetrics.fileName(
+        uid: uid,
+        formatKey: format.storageKey,
+        ext: ext,
+        width: imageWidth,
+        height: imageHeight,
+      );
       await _db.storage
           .from(AppConstants.postImagesBucket)
           .upload(path, imageFile);

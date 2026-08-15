@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../data/repositories/auth_repository.dart';
+import '../../../data/services/push_notification_service.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((_) => AuthRepository());
 
@@ -15,9 +16,15 @@ class AuthNotifier extends AsyncNotifier<void> {
 
   Future<void> signIn({required String email, required String password}) async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() => ref
-        .read(authRepositoryProvider)
-        .signIn(email: email, password: password));
+    state = await AsyncValue.guard(() async {
+      await ref
+          .read(authRepositoryProvider)
+          .signIn(email: email, password: password);
+      // Push must never block login if FCM fails.
+      try {
+        await PushNotificationService.instance.syncWithPreferences();
+      } catch (_) {}
+    });
   }
 
   Future<void> signUp({
@@ -27,16 +34,58 @@ class AuthNotifier extends AsyncNotifier<void> {
     required String username,
   }) async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() => ref
-        .read(authRepositoryProvider)
-        .signUp(email: email, password: password,
-                fullName: fullName, username: username));
+    state = await AsyncValue.guard(() async {
+      await ref.read(authRepositoryProvider).signUp(
+            email: email,
+            password: password,
+            fullName: fullName,
+            username: username,
+          );
+      try {
+        await PushNotificationService.instance.syncWithPreferences();
+      } catch (_) {}
+    });
   }
 
   Future<void> signOut() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(
-        () => ref.read(authRepositoryProvider).signOut());
+    state = await AsyncValue.guard(() async {
+      try {
+        // Remove this device token while the session is still valid (RLS).
+        await PushNotificationService.instance.unregisterToken();
+      } catch (_) {}
+      await ref.read(authRepositoryProvider).signOut();
+    });
+  }
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      await ref.read(authRepositoryProvider).changePassword(
+            currentPassword: currentPassword,
+            newPassword: newPassword,
+          );
+    });
+  }
+
+  Future<void> signOutOtherSessions() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() {
+      return ref.read(authRepositoryProvider).signOutOtherSessions();
+    });
+  }
+
+  Future<void> deleteAccount({required String password}) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      try {
+        await PushNotificationService.instance.unregisterToken();
+      } catch (_) {}
+      await ref.read(authRepositoryProvider).deleteAccount(password: password);
+    });
   }
 }
 
