@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
 
-// Simplified to solid cream text for the Connect brand wordmark
 class GradientText extends StatelessWidget {
   final String text;
   final TextStyle? style;
-  final Gradient? gradient; // Retained for API compatibility but unused
+  final Gradient? gradient;
 
   const GradientText(
     this.text, {
@@ -16,12 +15,11 @@ class GradientText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveStyle = (style ?? const TextStyle()).copyWith(
-      color: AppColors.cream100,
-    );
     return Text(
       text,
-      style: effectiveStyle,
+      style: (style ?? AppTextStyles.brandName).copyWith(
+        fontStyle: FontStyle.italic,
+      ),
     );
   }
 }

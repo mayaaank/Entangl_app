@@ -1,148 +1,218 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'app_colors.dart';
 
+/// One type system.
+/// Display / brand / titles: bundled Comico.
+/// Body / labels / fields: Be Vietnam Pro.
+/// Every style falls back to system color-emoji so stickers render.
 class AppTextStyles {
   AppTextStyles._();
 
-  // ── Display Headings (Inter 800 with tight letter spacing) ──
-  static final TextStyle displayXl = GoogleFonts.inter(
-    fontSize: 48,
-    fontWeight: FontWeight.w800,
-    height: 52 / 48,
-    letterSpacing: -1.92,
-    color: AppColors.textPrimary,
+  static const String displayFamily = 'Comico';
+
+  static const List<String> emojiFallback = [
+    'Apple Color Emoji',
+    'Noto Color Emoji',
+    'Segoe UI Emoji',
+  ];
+
+  static TextStyle emojiOnly({double size = 22}) => const TextStyle(
+        fontFamily: 'Apple Color Emoji',
+        fontFamilyFallback: [
+          'Noto Color Emoji',
+          'Segoe UI Emoji',
+        ],
+      ).copyWith(fontSize: size, height: 1.1);
+
+  static TextStyle _display({
+    required double size,
+    required FontWeight weight,
+    required double height,
+    double letterSpacing = 0,
+    FontStyle? fontStyle,
+  }) =>
+      TextStyle(
+        fontFamily: displayFamily,
+        fontFamilyFallback: emojiFallback,
+        fontSize: size,
+        fontWeight: weight,
+        height: height / size,
+        letterSpacing: letterSpacing,
+        fontStyle: fontStyle,
+      );
+
+  static TextStyle _body({
+    required double size,
+    required FontWeight weight,
+    required double height,
+    double letterSpacing = 0,
+  }) =>
+      GoogleFonts.beVietnamPro(
+        fontSize: size,
+        fontWeight: weight,
+        height: height / size,
+        letterSpacing: letterSpacing,
+      ).copyWith(fontFamilyFallback: [
+        ...emojiFallback,
+        ...?GoogleFonts.beVietnamPro().fontFamilyFallback,
+      ]);
+
+  static final TextStyle displayXl = _display(
+    size: 40,
+    weight: FontWeight.w400,
+    height: 46,
+    letterSpacing: -0.6,
   );
 
-  static final TextStyle displayLg = GoogleFonts.inter(
-    fontSize: 40,
-    fontWeight: FontWeight.w700,
-    height: 44 / 40,
-    letterSpacing: -1.20,
-    color: AppColors.textPrimary,
+  static final TextStyle displayLg = _display(
+    size: 28,
+    weight: FontWeight.w400,
+    height: 34,
+    letterSpacing: -0.4,
   );
 
-  static final TextStyle displayMd = GoogleFonts.inter(
-    fontSize: 24,
-    fontWeight: FontWeight.w700,
-    height: 30 / 24,
-    letterSpacing: -0.48,
-    color: AppColors.textPrimary,
+  static final TextStyle displayMd = _display(
+    size: 22,
+    weight: FontWeight.w400,
+    height: 28,
   );
 
-  static final TextStyle title1 = GoogleFonts.inter(
-    fontSize: 28,
-    fontWeight: FontWeight.w600,
-    height: 34 / 28,
-    letterSpacing: -0.56,
-    color: AppColors.textPrimary,
+  static final TextStyle title1 = _display(
+    size: 24,
+    weight: FontWeight.w400,
+    height: 30,
+    letterSpacing: -0.3,
   );
 
-  static final TextStyle title2 = GoogleFonts.inter(
-    fontSize: 22,
-    fontWeight: FontWeight.w600,
-    height: 28 / 22,
-    letterSpacing: -0.44,
-    color: AppColors.textPrimary,
+  static final TextStyle title2 = _display(
+    size: 22,
+    weight: FontWeight.w400,
+    height: 28,
   );
 
-  static final TextStyle subtitle = GoogleFonts.inter(
-    fontSize: 18,
-    fontWeight: FontWeight.w500,
-    height: 24 / 18,
-    letterSpacing: 0,
-    color: AppColors.textPrimary,
+  static final TextStyle subtitle = _body(
+    size: 16,
+    weight: FontWeight.w500,
+    height: 24,
   );
 
-  // ── Body text ──
-  static final TextStyle bodyLarge = GoogleFonts.inter(
-    fontSize: 16,
-    fontWeight: FontWeight.w400,
-    height: 1.5,
-    letterSpacing: 0.16,
-    color: AppColors.textPrimary,
+  static final TextStyle bodyLarge = _body(
+    size: 16,
+    weight: FontWeight.w500,
+    height: 24,
   );
 
-  static final TextStyle bodyMedium = GoogleFonts.inter(
-    fontSize: 14,
-    fontWeight: FontWeight.w400,
-    height: 1.43,
-    letterSpacing: 0.14,
-    color: AppColors.textPrimary,
+  static final TextStyle bodyMedium = _body(
+    size: 14,
+    weight: FontWeight.w400,
+    height: 20,
   );
 
-  static final TextStyle bodySmall = GoogleFonts.inter(
-    fontSize: 13,
-    fontWeight: FontWeight.w400,
-    height: 1.4,
-    letterSpacing: 0.13,
-    color: AppColors.textSecondary,
+  static final TextStyle bodySmall = _body(
+    size: 13,
+    weight: FontWeight.w400,
+    height: 18,
   );
 
-  // ── Labels ──
-  static final TextStyle labelLarge = GoogleFonts.inter(
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 0.1,
-    color: AppColors.textPrimary,
+  static final TextStyle labelLarge = _body(
+    size: 14,
+    weight: FontWeight.w600,
+    height: 20,
   );
 
-  static final TextStyle labelMedium = GoogleFonts.inter(
-    fontSize: 13,
-    fontWeight: FontWeight.w500,
-    height: 1.38,
-    letterSpacing: 0.26,
-    color: AppColors.textPrimary,
+  static final TextStyle labelMedium = _body(
+    size: 13,
+    weight: FontWeight.w600,
+    height: 18,
   );
 
-  static final TextStyle labelSmall = GoogleFonts.inter(
-    fontSize: 11,
-    fontWeight: FontWeight.w500,
-    height: 1.45,
-    letterSpacing: 0.44,
-    color: AppColors.textSecondary,
+  static final TextStyle labelSmall = _body(
+    size: 12,
+    weight: FontWeight.w600,
+    height: 16,
+    letterSpacing: 0.4,
   );
 
-  // ── Timestamp / caption ──
-  static final TextStyle timestamp = GoogleFonts.inter(
-    fontSize: 13,
-    fontWeight: FontWeight.w400,
-    height: 1.38,
-    letterSpacing: 0.13,
-    color: AppColors.textSecondary,
+  static final TextStyle timestamp = _body(
+    size: 12,
+    weight: FontWeight.w500,
+    height: 16,
+    letterSpacing: 0.2,
   );
 
-  // ── Doodle Accent Style (Comic Neue for mascot descriptions) ──
-  static final TextStyle doodleAccent = GoogleFonts.comicNeue(
-    fontSize: 14,
-    fontWeight: FontWeight.w700,
-    color: AppColors.textSecondary,
+  static final TextStyle doodleAccent = _display(
+    size: 14,
+    weight: FontWeight.w400,
+    height: 18,
   );
 
-  // ── Legacy mappings for compatibility ──
+  static final TextStyle brandName = _display(
+    size: 26,
+    weight: FontWeight.w400,
+    height: 30,
+    letterSpacing: -0.3,
+    fontStyle: FontStyle.italic,
+  );
+
+  static final TextStyle quote = _display(
+    size: 22,
+    weight: FontWeight.w400,
+    height: 28,
+    letterSpacing: -0.2,
+  );
+
   static final TextStyle heroTitle = displayXl;
   static final TextStyle pageTitle = displayLg;
   static final TextStyle sectionTitle = title1;
-  static final TextStyle brandName = title2;
-  static final TextStyle username = GoogleFonts.inter(
-    fontSize: 14,
-    fontWeight: FontWeight.w500,
-    color: AppColors.primary,
+  static final TextStyle username = _body(
+    size: 16,
+    weight: FontWeight.w600,
+    height: 22,
   );
-  static final TextStyle statNumber = GoogleFonts.inter(
-    fontSize: 28,
-    fontWeight: FontWeight.w600,
-    height: 1.0,
-    color: AppColors.textPrimary,
+  static final TextStyle statNumber = _display(
+    size: 28,
+    weight: FontWeight.w400,
+    height: 32,
   );
-  static final TextStyle statLabel = labelSmall;
-  static final TextStyle buttonLarge = labelMedium.copyWith(fontSize: 13);
-  static final TextStyle buttonMedium = labelMedium.copyWith(fontSize: 13);
+  static final TextStyle statLabel = _body(
+    size: 12,
+    weight: FontWeight.w600,
+    height: 16,
+    letterSpacing: 0.2,
+  );
+  static final TextStyle buttonLarge = _body(
+    size: 13,
+    weight: FontWeight.w600,
+    height: 16,
+    letterSpacing: 0.4,
+  );
+  static final TextStyle buttonMedium = buttonLarge;
 
-  static TextStyle sectionLabel({Color? color}) => GoogleFonts.inter(
-    fontSize: 11,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 1.2,
-    color: color ?? AppColors.textSecondary,
-  );
+  static TextStyle sectionLabel({Color? color}) => _body(
+        size: 12,
+        weight: FontWeight.w600,
+        height: 16,
+        letterSpacing: 0.4,
+      ).copyWith(color: color);
+
+  static TextTheme materialTextTheme([TextTheme? base]) {
+    final seed = base ?? const TextTheme();
+    return seed.copyWith(
+      displayLarge: displayXl,
+      displayMedium: displayLg,
+      displaySmall: title1,
+      headlineLarge: displayLg,
+      headlineMedium: displayMd,
+      headlineSmall: title2,
+      titleLarge: title1,
+      titleMedium: username,
+      titleSmall: labelLarge,
+      bodyLarge: bodyLarge,
+      bodyMedium: bodyMedium,
+      bodySmall: bodySmall,
+      labelLarge: labelLarge,
+      labelMedium: labelMedium,
+      labelSmall: labelSmall,
+    );
+  }
 }

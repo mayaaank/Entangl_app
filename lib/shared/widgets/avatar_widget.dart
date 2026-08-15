@@ -4,9 +4,10 @@ import '../../core/theme/app_colors.dart';
 
 class AvatarWidget extends StatelessWidget {
   final String? imageUrl;
-  final double  size;
-  final bool    showRing;
+  final double size;
+  final bool showRing;
   final VoidCallback? onTap;
+  final Color? ringColor;
 
   const AvatarWidget({
     super.key,
@@ -14,42 +15,44 @@ class AvatarWidget extends StatelessWidget {
     this.size = 44,
     this.showRing = false,
     this.onTap,
+    this.ringColor,
   });
 
   @override
   Widget build(BuildContext context) {
     Widget avatar = Container(
-      width:  size,
+      width: size,
       height: size,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.inkWarm,
+        color: AppColors.surfaceHigh,
+        border: Border.all(color: AppColors.outline, width: 1.5),
       ),
       child: ClipOval(
         child: imageUrl != null && imageUrl!.isNotEmpty
             ? CachedNetworkImage(
                 imageUrl: imageUrl!,
-                width:  size,
+                width: size,
                 height: size,
                 fit: BoxFit.cover,
                 placeholder: (_, __) => Container(
-                  color: AppColors.inkWarm,
+                  color: AppColors.surfaceHigh,
                   child: Icon(
                     Icons.person_rounded,
                     size: size * 0.45,
-                    color: AppColors.textMuted,
+                    color: AppColors.outline,
                   ),
                 ),
                 errorWidget: (_, __, ___) => Icon(
                   Icons.person_rounded,
                   size: size * 0.45,
-                  color: AppColors.textMuted,
+                  color: AppColors.outline,
                 ),
               )
             : Icon(
                 Icons.person_rounded,
                 size: size * 0.45,
-                color: AppColors.textMuted,
+                color: AppColors.outline,
               ),
       ),
     );
@@ -57,15 +60,16 @@ class AvatarWidget extends StatelessWidget {
     if (showRing) {
       avatar = Container(
         padding: const EdgeInsets.all(2.5),
-        decoration: const BoxDecoration(
-          color: AppColors.cream100,
+        decoration: BoxDecoration(
           shape: BoxShape.circle,
+          color: ringColor ?? AppColors.secondaryContainer,
+          border: Border.all(color: AppColors.outline, width: 1.5),
         ),
         child: Container(
           padding: const EdgeInsets.all(2),
           decoration: const BoxDecoration(
-            color: AppColors.inkBase,
             shape: BoxShape.circle,
+            color: AppColors.surface,
           ),
           child: avatar,
         ),

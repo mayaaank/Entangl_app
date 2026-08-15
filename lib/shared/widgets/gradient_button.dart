@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/entangl_colors.dart';
 
 class GradientButton extends StatefulWidget {
   final String label;
@@ -10,137 +10,92 @@ class GradientButton extends StatefulWidget {
   final double height;
   final Widget? leadingIcon;
   final Widget? trailingIcon;
+  final bool outlined;
 
   const GradientButton({
     super.key,
     required this.label,
     required this.onTap,
     this.isLoading = false,
-    this.height = 52,
+    this.height = 48,
     this.leadingIcon,
     this.trailingIcon,
+    this.outlined = false,
   });
 
   @override
   State<GradientButton> createState() => _GradientButtonState();
 }
 
-class _GradientButtonState extends State<GradientButton> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  bool _isPressed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 100),
-      lowerBound: 0.96,
-      upperBound: 1.0,
-      value: 1.0,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _handleTapDown(TapDownDetails details) {
-    if (widget.onTap != null && !widget.isLoading) {
-      setState(() {
-        _isPressed = true;
-      });
-      _controller.animateTo(0.96, curve: Curves.easeOutQuad);
-    }
-  }
-
-  void _handleTapUp(TapUpDetails details) {
-    if (widget.onTap != null && !widget.isLoading) {
-      setState(() {
-        _isPressed = false;
-      });
-      _controller.animateTo(1.0, curve: Curves.elasticOut);
-      HapticFeedback.lightImpact();
-      widget.onTap!();
-    }
-  }
-
-  void _handleTapCancel() {
-    if (widget.onTap != null && !widget.isLoading) {
-      setState(() {
-        _isPressed = false;
-      });
-      _controller.animateTo(1.0, curve: Curves.easeOutQuad);
-    }
-  }
+class _GradientButtonState extends State<GradientButton> {
+  bool _pressed = false;
 
   @override
   Widget build(BuildContext context) {
-    final isDisabled = widget.onTap == null || widget.isLoading;
+    final disabled = widget.onTap == null || widget.isLoading;
+    final filled = !widget.outlined;
+    final palette = context.palette;
 
-    Color containerColor;
-    List<BoxShadow>? shadows;
-    Color textColor;
-
-    if (isDisabled) {
-      containerColor = AppColors.inkWarm;
-      textColor = AppColors.textMuted;
-      shadows = null;
-    } else if (_isPressed) {
-      containerColor = AppColors.cream80;
-      textColor = AppColors.textOnCream;
-      shadows = AppColors.haloPress;
-    } else {
-      containerColor = AppColors.cream100;
-      textColor = AppColors.textOnCream;
-      shadows = AppColors.shadowCard;
-    }
-
-    return ScaleTransition(
-      scale: _controller,
-      child: GestureDetector(
-        onTapDown: _handleTapDown,
-        onTapUp: _handleTapUp,
-        onTapCancel: _handleTapCancel,
-        child: Container(
-          height: widget.height,
-          decoration: BoxDecoration(
-            color: containerColor,
-            borderRadius: BorderRadius.circular(999),
-            boxShadow: shadows,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (widget.leadingIcon != null && !widget.isLoading) ...[
-                widget.leadingIcon!,
-                const SizedBox(width: 8),
-              ],
-              if (widget.isLoading)
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: textColor,
-                  ),
-                )
-              else
-                Text(
-                  widget.label,
-                  style: AppTextStyles.labelMedium.copyWith(
-                    color: textColor,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              if (widget.trailingIcon != null && !widget.isLoading) ...[
-                const SizedBox(width: 8),
-                widget.trailingIcon!,
-              ],
+    return GestureDetector(
+      onTapDown: disabled ? null : (_) => setState(() => _pressed = true),
+      onTapUp: disabled
+          ? null
+          : (_) {
+              setState(() => _pressed = false);
+              HapticFeedback.lightImpact();
+              widget.onTap!();
+            },
+      onTapCancel: disabled ? null : () => setState(() => _pressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 90),
+        height: widget.height,
+        transform: Matrix4.translationValues(
+          _pressed ? 3 : 0,
+          _pressed ? 3 : 0,
+          0,
+        ),
+        decoration: BoxDecoration(
+          color: disabled
+              ? palette.surfaceHigh
+              : filled
+                  ? palette.primary
+                  : palette.surfaceLowest,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: palette.onSurface, width: 1.5),
+          boxShadow: disabled || _pressed ? null : palette.shadowCard,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (widget.leadingIcon != null && !widget.isLoading) ...[
+              widget.leadingIcon!,
+              const SizedBox(width: 8),
             ],
-          ),
+            if (widget.isLoading)
+              SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: filled ? palette.onPrimary : palette.onSurface,
+                ),
+              )
+            else
+              Text(
+                widget.label,
+                style: AppTextStyles.buttonLarge.copyWith(
+                  color: disabled
+                      ? palette.outline
+                      : filled
+                          ? palette.onPrimary
+                          : palette.onSurface,
+                ),
+              ),
+            if (widget.trailingIcon != null && !widget.isLoading) ...[
+              const SizedBox(width: 8),
+              widget.trailingIcon!,
+            ],
+          ],
         ),
       ),
     );

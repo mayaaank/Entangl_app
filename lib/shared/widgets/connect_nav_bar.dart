@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:ui';
-import 'package:flutter_animate/flutter_animate.dart';
-import '../../core/theme/app_colors.dart';
-import 'mascot_widgets.dart';
+import '../../core/theme/entangl_colors.dart';
 
 class ConnectNavBar extends StatelessWidget {
   final int currentIndex;
@@ -18,64 +15,45 @@ class ConnectNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).padding.bottom + 16,
-        left: 20,
-        right: 20,
+      padding: EdgeInsets.fromLTRB(
+        28,
+        0,
+        28,
+        MediaQuery.of(context).padding.bottom + 12,
       ),
-      child: SizedBox(
+      child: Container(
         height: 64,
-        child: Stack(
-          clipBehavior: Clip.none,
+        decoration: BoxDecoration(
+          color: context.palette.navDock,
+          borderRadius: BorderRadius.circular(999),
+          boxShadow: context.palette.shadowFloat,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            // Background warm ink card
-            Positioned.fill(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.inkMid.withOpacity(0.85),
-                      borderRadius: BorderRadius.circular(999),
-                      border: Border.all(
-                        color: AppColors.borderSubtle,
-                        width: 0.5,
-                      ),
-                      boxShadow: AppColors.shadowFloat,
-                    ),
-                  ),
-                ),
-              ),
+            _DockItem(
+              icon: Icons.home_outlined,
+              activeIcon: Icons.home_rounded,
+              isActive: currentIndex == 0,
+              onTap: () => onTap(0),
             ),
-            // Navigation row
-            Positioned.fill(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _NavItem(
-                    icon: Icons.home_outlined,
-                    activeIcon: Icons.home_rounded,
-                    isActive: currentIndex == 0,
-                    onTap: () => onTap(0),
-                    activeCharacter: const GhostMascot(
-                      expression: GhostExpression.dancing,
-                      size: 20,
-                    ),
-                  ),
-                  _CreateButton(onTap: () => onTap(1)),
-                  _NavItem(
-                    icon: Icons.person_outline_rounded,
-                    activeIcon: Icons.person_rounded,
-                    isActive: currentIndex == 2,
-                    onTap: () => onTap(2),
-                    activeCharacter: const FrogMascot(
-                      expression: FrogExpression.sitting,
-                      size: 20,
-                    ),
-                  ),
-                ],
-              ),
+            _DockItem(
+              icon: Icons.notes_outlined,
+              activeIcon: Icons.notes_rounded,
+              isActive: currentIndex == 1,
+              onTap: () => onTap(1),
+            ),
+            _DockItem(
+              icon: Icons.favorite_border_rounded,
+              activeIcon: Icons.favorite_rounded,
+              isActive: currentIndex == 2,
+              onTap: () => onTap(2),
+            ),
+            _DockItem(
+              icon: Icons.person_outline_rounded,
+              activeIcon: Icons.person_rounded,
+              isActive: currentIndex == 3,
+              onTap: () => onTap(3),
             ),
           ],
         ),
@@ -84,142 +62,47 @@ class ConnectNavBar extends StatelessWidget {
   }
 }
 
-class _NavItem extends StatelessWidget {
+class _DockItem extends StatelessWidget {
   final IconData icon;
   final IconData activeIcon;
   final bool isActive;
   final VoidCallback onTap;
-  final Widget activeCharacter;
 
-  const _NavItem({
+  const _DockItem({
     required this.icon,
     required this.activeIcon,
     required this.isActive,
     required this.onTap,
-    required this.activeCharacter,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
-        width: 72,
+        width: 56,
         height: 64,
-        child: Stack(
-          alignment: Alignment.center,
-          clipBehavior: Clip.none,
-          children: [
-            if (isActive)
-              Positioned(
-                top: -24,
-                child: activeCharacter
-                    .animate()
-                    .scale(
-                      begin: const Offset(0.3, 0.3),
-                      end: const Offset(1.0, 1.0),
-                      duration: 300.ms,
-                      curve: Curves.elasticOut,
-                    )
-                    .moveY(begin: 12, end: 0, duration: 300.ms, curve: Curves.easeOutBack),
-              ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 12),
-                Icon(
-                  isActive ? activeIcon : icon,
-                  key: ValueKey(isActive),
-                  color: isActive
-                      ? AppColors.cream100
-                      : AppColors.textTertiary,
-                  size: 24,
-                ),
-                const SizedBox(height: 4),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeOutBack,
-                  width: isActive ? 6 : 0,
-                  height: isActive ? 6 : 0,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.cream60,
-                  ),
-                ),
-              ],
+        child: Center(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: isActive ? context.palette.navActive : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CreateButton extends StatefulWidget {
-  final VoidCallback onTap;
-  const _CreateButton({required this.onTap});
-
-  @override
-  State<_CreateButton> createState() => _CreateButtonState();
-}
-
-class _CreateButtonState extends State<_CreateButton> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 100),
-      lowerBound: 0.92,
-      upperBound: 1.0,
-      value: 1.0,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _handleTapDown(TapDownDetails details) {
-    _controller.animateTo(0.92, curve: Curves.easeOutQuad);
-  }
-
-  void _handleTapUp(TapUpDetails details) {
-    _controller.animateTo(1.0, curve: Curves.elasticOut);
-    HapticFeedback.mediumImpact();
-    widget.onTap();
-  }
-
-  void _handleTapCancel() {
-    _controller.animateTo(1.0, curve: Curves.easeOutQuad);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _controller,
-      child: GestureDetector(
-        onTapDown: _handleTapDown,
-        onTapUp: _handleTapUp,
-        onTapCancel: _handleTapCancel,
-        child: Container(
-          width: 56,
-          height: 56,
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: AppColors.cream100,
-            shape: BoxShape.circle,
-            boxShadow: AppColors.shadowFloat,
-          ),
-          child: const Icon(
-            Icons.add_rounded,
-            color: AppColors.textOnCream,
-            size: 28,
+            child: Icon(
+              isActive ? activeIcon : icon,
+              color: isActive
+                  ? context.palette.onSurface
+                  : context.palette.navInactive,
+              size: 24,
+            ),
           ),
         ),
       ),
