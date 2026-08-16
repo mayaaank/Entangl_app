@@ -35,6 +35,13 @@ String humaniseAuthError(Object error) {
     return 'Too many attempts. Please wait a moment and try again.';
   }
 
+  if (msg.contains('could not open google') ||
+      msg.contains('unable to process request') ||
+      msg.contains('error 403') ||
+      msg.contains('disallowed_useragent')) {
+    return 'Google sign-in could not complete. Please try again.';
+  }
+
   // Weak password
   if (msg.contains('password') && msg.contains('weak') ||
       msg.contains('password should be at least')) {

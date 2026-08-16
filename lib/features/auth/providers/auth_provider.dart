@@ -49,6 +49,20 @@ class AuthNotifier extends AsyncNotifier<void> {
     });
   }
 
+  Future<void> signInWithGoogle() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      try {
+        await ref.read(authRepositoryProvider).signInWithGoogle();
+      } on GoogleSignInCancelled {
+        return;
+      }
+      try {
+        await PushNotificationService.instance.syncWithPreferences();
+      } catch (_) {}
+    });
+  }
+
   Future<void> signOut() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {

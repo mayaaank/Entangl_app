@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/entangl_colors.dart';
 import '../../../core/utils/auth_errors.dart';
 import '../../../shared/widgets/gradient_button.dart';
 import '../../../shared/widgets/mascot_widgets.dart';
+import '../../../data/services/supabase_service.dart';
 import '../../../shared/widgets/doodle_widget.dart';
 import '../providers/auth_provider.dart';
 import '../utils/auth_landing.dart';
@@ -24,12 +27,46 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _password = TextEditingController();
   final _formKey  = GlobalKey<FormState>();
   bool _obscure   = true;
+  bool _routing   = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _routeIfSignedIn();
+    });
+  }
 
   @override
   void dispose() {
     _email.dispose();
     _password.dispose();
     super.dispose();
+  }
+
+  Future<void> _routeIfSignedIn() async {
+    if (_routing || SupabaseService.currentSession == null) return;
+    _routing = true;
+    try {
+      final dest = await landingRouteAfterAuth();
+      if (mounted) context.go(dest);
+    } finally {
+      _routing = false;
+    }
+  }
+
+  Future<void> _google() async {
+    FocusScope.of(context).unfocus();
+    await ref.read(authNotifierProvider.notifier).signInWithGoogle();
+    if (!mounted) return;
+    final authState = ref.read(authNotifierProvider);
+    if (authState is AsyncError) {
+      _showError(humaniseAuthError(authState.error));
+      return;
+    }
+    if (SupabaseService.currentSession != null) {
+      await _routeIfSignedIn();
+    }
   }
 
   Future<void> _submit() async {
@@ -71,6 +108,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final isLoading =
         ref.watch(authNotifierProvider) is AsyncLoading;
+    final palette = context.palette;
+
+    ref.listen(authStateProvider, (prev, next) {
+      final event = next.value?.event;
+      if (event == AuthChangeEvent.signedIn) {
+        _routeIfSignedIn();
+      }
+    });
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -140,10 +185,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       bottom: 32,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceLowest,
+                      color: palette.surfaceLowest,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: AppColors.onSurface,
+                        color: palette.onSurface,
                         width: 1.5,
                       ),
                       boxShadow: AppColors.shadowCard,
@@ -157,14 +202,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           Center(
                             child: Text(
                               'Welcome back',
-                              style: AppTextStyles.displayLg,
+                              style: AppTextStyles.displayLg.copyWith(
+                                color: palette.onSurface,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'Sign in to continue',
                             style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.textTertiary,
+                              color: palette.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(height: 32),
@@ -201,6 +248,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             onTap: isLoading ? null : _submit,
                             isLoading: isLoading,
                           ),
+                          const SizedBox(height: 14),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Divider(color: palette.outlineVariant),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
+                                child: Text(
+                                  'or',
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: palette.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Divider(color: palette.outlineVariant),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+                          GradientButton(
+                            label: 'Continue with Google',
+                            outlined: true,
+                            onTap: isLoading ? null : _google,
+                            leadingIcon: Icon(
+                              Icons.g_mobiledata_rounded,
+                              color: palette.onSurface,
+                              size: 28,
+                            ),
+                          ),
                           const SizedBox(height: 16),
                           Center(
                             child: GestureDetector(
@@ -209,7 +288,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               child: Text(
                                 'Forgot password?',
                                 style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.primary,
+                                  color: palette.primary,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -222,7 +301,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               Text(
                                 "Don't have an account? ",
                                 style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.textTertiary,
+                                  color: palette.onSurfaceVariant,
                                 ),
                               ),
                               GestureDetector(
@@ -230,7 +309,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 child: Text(
                                   'Sign up',
                                   style: AppTextStyles.bodyMedium.copyWith(
-                                    color: AppColors.primary,
+                                    color: palette.primary,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),

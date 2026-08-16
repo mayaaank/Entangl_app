@@ -20,6 +20,11 @@ class AppConstants {
   static const int postMaxLength     = 500;
   static const int passwordMinLength = 6;
 
+  /// Deep link that returns from Google / Apple OAuth.
+  /// Must be listed in Supabase Auth → URL Configuration → Redirect URLs.
+  static const oauthRedirectTo = 'entangl://auth-callback';
+  static const oauthCallbackScheme = 'entangl';
+
   /// Profile emails that can open Admin Requests.
   static const adminEmails = [
     'rekt11.cam@gmail.com',

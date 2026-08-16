@@ -45,7 +45,8 @@ final routerProvider = Provider<GoRouter>((_) {
           loc == AppRoutes.forgotPassword ||
           loc == AppRoutes.approvalStatus;
       if (!hasSession && !isAuthPage) return AppRoutes.login;
-      if (hasSession  && loc == AppRoutes.login) return AppRoutes.home;
+      // Do not bounce a session from /login to /home here.
+      // Login decides landing (home vs approval) after email or OAuth.
       return null;
     },
     routes: [
