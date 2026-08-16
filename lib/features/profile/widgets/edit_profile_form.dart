@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/entangl_colors.dart';
 import '../../../shared/widgets/avatar_widget.dart';
 import '../../../shared/widgets/gradient_button.dart';
 import '../providers/profile_provider.dart';
@@ -102,7 +103,7 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
           const SizedBox(height: 8),
           Text('Tap to change photo',
               style: AppTextStyles.labelSmall
-                  .copyWith(color: AppColors.textSecondary)),
+                  .copyWith(color: context.palette.onSurfaceVariant)),
           const SizedBox(height: 36),
           _LabeledField(label: 'Full Name', controller: _name,
               onChanged: notifier.setFullName),
@@ -115,7 +116,7 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
             children: [
               Text('Bio'.toUpperCase(),
                   style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.palette.onSurfaceVariant,
                     letterSpacing: 1.2,
                   )),
               const SizedBox(height: 8),
@@ -123,8 +124,9 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
                 controller: _bio,
                 maxLines: 4, maxLength: 160,
                 onChanged: notifier.setBio,
+                cursorColor: context.palette.primary,
                 style: AppTextStyles.bodyMedium
-                    .copyWith(color: AppColors.textPrimary),
+                    .copyWith(color: context.palette.onSurface),
                 decoration: const InputDecoration(
                     hintText: 'Tell us about yourself...'),
               ),
@@ -156,16 +158,17 @@ class _LabeledField extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label.toUpperCase(),
-              style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 10,
-                  letterSpacing: 1.2,
-                  fontWeight: FontWeight.w600)),
+              style: AppTextStyles.labelSmall.copyWith(
+                  color: context.palette.onSurfaceVariant,
+                  letterSpacing: 1.2)),
           const SizedBox(height: 8),
           TextField(
             controller: controller,
             onChanged: onChanged,
-            style: const TextStyle(color: AppColors.textPrimary),
+            cursorColor: context.palette.primary,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: context.palette.onSurface,
+            ),
             decoration: InputDecoration(hintText: label),
           ),
         ],

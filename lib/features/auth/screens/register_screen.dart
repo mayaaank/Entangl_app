@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/entangl_colors.dart';
 import '../../../core/utils/auth_errors.dart';
 import '../../../shared/widgets/gradient_button.dart';
 import '../../../shared/widgets/mascot_widgets.dart';
@@ -104,6 +105,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final isLoading = ref.watch(authNotifierProvider) is AsyncLoading;
+    final palette = context.palette;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -162,10 +164,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       bottom: 32,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceLowest,
+                      color: palette.surfaceLowest,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: AppColors.onSurface,
+                        color: palette.onSurface,
                         width: 1.5,
                       ),
                       boxShadow: AppColors.shadowCard,
@@ -179,14 +181,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           Center(
                             child: Text(
                               'Create Account',
-                              style: AppTextStyles.displayLg,
+                              style: AppTextStyles.displayLg.copyWith(
+                                color: palette.onSurface,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'Join Entangl today',
                             style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.textTertiary,
+                              color: palette.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(height: 32),
@@ -262,7 +266,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               Text(
                                 'Already have an account? ',
                                 style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.textTertiary,
+                                  color: palette.onSurfaceVariant,
                                 ),
                               ),
                               GestureDetector(
@@ -270,7 +274,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 child: Text(
                                   'Sign in',
                                   style: AppTextStyles.bodyMedium.copyWith(
-                                    color: AppColors.primary,
+                                    color: palette.primary,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),

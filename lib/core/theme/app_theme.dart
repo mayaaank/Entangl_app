@@ -116,10 +116,27 @@ class AppTheme {
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: palette.error, width: 1.5),
         ),
-        hintStyle: AppTextStyles.bodyMedium.copyWith(color: palette.outline),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: palette.error, width: 2),
+        ),
+        hintStyle: AppTextStyles.bodyMedium.copyWith(
+          color: palette.onSurfaceVariant,
+        ),
         labelStyle: AppTextStyles.labelSmall.copyWith(
           color: palette.onSurfaceVariant,
         ),
+        floatingLabelStyle: AppTextStyles.labelSmall.copyWith(
+          color: palette.onSurface,
+        ),
+        prefixIconColor: palette.onSurfaceVariant,
+        suffixIconColor: palette.onSurfaceVariant,
+        errorStyle: AppTextStyles.bodySmall.copyWith(color: palette.error),
+      ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: palette.primary,
+        selectionColor: palette.primary.withValues(alpha: 0.28),
+        selectionHandleColor: palette.primary,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(

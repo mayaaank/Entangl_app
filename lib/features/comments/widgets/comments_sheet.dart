@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/entangl_colors.dart';
 import '../../../data/models/comment_model.dart';
 import '../../../data/models/post_model.dart';
 import '../../../data/services/supabase_service.dart';
@@ -475,17 +476,16 @@ class _CommentInputState extends ConsumerState<_CommentInput> {
               child: TextField(
                 controller: _ctrl,
                 onChanged:  inputNotifier.setText,
-                style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 14),
+                cursorColor: context.palette.primary,
+                style: AppTextStyles.bodyMedium.copyWith(
+                    color: context.palette.onSurface),
                 decoration: InputDecoration(
                   hintText: 'Add a comment...',
-                  hintStyle: const TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 14,
+                  hintStyle: AppTextStyles.bodyMedium.copyWith(
+                    color: context.palette.onSurfaceVariant,
                   ),
                   filled:      true,
-                  fillColor:   AppColors.paperAsh,
+                  fillColor:   context.palette.surfaceLow,
                   contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16, vertical: 10),
                   border: OutlineInputBorder(

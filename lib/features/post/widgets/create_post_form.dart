@@ -220,6 +220,7 @@ class _CreatePostFormState extends ConsumerState<CreatePostForm> {
                         }) =>
                             null,
                         style: AppTextStyles.bodyLarge.copyWith(
+                          color: palette.onSurface,
                           fontFamilyFallback: AppTextStyles.emojiFallback,
                         ),
                         cursorColor: palette.primary,

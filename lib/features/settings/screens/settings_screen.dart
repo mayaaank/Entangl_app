@@ -58,14 +58,6 @@ class SettingsScreen extends ConsumerWidget {
               label: 'Appearance',
               rows: [
                 _ThemeModeRow(
-                  label: 'System',
-                  selected: themeMode == ThemeMode.system,
-                  onTap: () => ref
-                      .read(themeModeProvider.notifier)
-                      .setMode(ThemeMode.system),
-                ),
-                Divider(height: 1, indent: 56, color: palette.outlineVariant),
-                _ThemeModeRow(
                   label: 'Light',
                   selected: themeMode == ThemeMode.light,
                   onTap: () => ref
@@ -79,6 +71,14 @@ class SettingsScreen extends ConsumerWidget {
                   onTap: () => ref
                       .read(themeModeProvider.notifier)
                       .setMode(ThemeMode.dark),
+                ),
+                Divider(height: 1, indent: 56, color: palette.outlineVariant),
+                _ThemeModeRow(
+                  label: 'System',
+                  selected: themeMode == ThemeMode.system,
+                  onTap: () => ref
+                      .read(themeModeProvider.notifier)
+                      .setMode(ThemeMode.system),
                 ),
               ],
             ),

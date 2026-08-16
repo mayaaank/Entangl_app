@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/entangl_colors.dart';
 
 /// Reusable labelled text field for auth screens.
 /// Pure UI — no providers, no logic.
@@ -26,13 +26,14 @@ class AuthField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label.toUpperCase(),
           style: AppTextStyles.labelSmall.copyWith(
-            color: AppColors.onSurfaceVariantDark,
+            color: palette.onSurfaceVariant,
             letterSpacing: 1.2,
           ),
         ),
@@ -41,10 +42,13 @@ class AuthField extends StatelessWidget {
           controller: controller,
           keyboardType: type,
           obscureText: obscure,
-          style: AppTextStyles.bodyMedium
-              .copyWith(color: AppColors.onSurfaceDark),
+          cursorColor: palette.primary,
+          style: AppTextStyles.bodyMedium.copyWith(color: palette.onSurface),
           decoration: InputDecoration(
             hintText: hint,
+            hintStyle: AppTextStyles.bodyMedium.copyWith(
+              color: palette.onSurfaceVariant,
+            ),
             suffixIcon: onToggleObscure != null
                 ? IconButton(
                     onPressed: onToggleObscure,
@@ -52,7 +56,7 @@ class AuthField extends StatelessWidget {
                       obscure
                           ? Icons.visibility_off_outlined
                           : Icons.visibility_outlined,
-                      color: AppColors.outline,
+                      color: palette.onSurfaceVariant,
                       size: 20,
                     ),
                   )

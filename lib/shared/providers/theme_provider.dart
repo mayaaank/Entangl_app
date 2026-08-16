@@ -8,16 +8,16 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
   @override
   ThemeMode build() {
     _hydrate();
-    return ThemeMode.system;
+    return ThemeMode.light;
   }
 
   Future<void> _hydrate() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_themeKey);
     state = switch (raw) {
-      'light' => ThemeMode.light,
       'dark' => ThemeMode.dark,
-      _ => ThemeMode.system,
+      'system' => ThemeMode.system,
+      _ => ThemeMode.light,
     };
   }
 
